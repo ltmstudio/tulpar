@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\CarCatalogController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -17,3 +18,9 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+// Car catalog
+Route::get('/catalog/cars', [CarCatalogController::class, 'index']);
+Route::get('/catalog/cars/all', [CarCatalogController::class, 'all']);
+Route::get('/catalog/cars/{id}', [CarCatalogController::class, 'show']);
+Route::get('/catalog/search', [CarCatalogController::class, 'search']);
