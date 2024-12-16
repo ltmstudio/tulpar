@@ -44,7 +44,7 @@ class TxDriverProfile extends Model
         $now = time();
         if (!$usr) {
             $usr = new User;
-            $usr->email = 'drv' . $this->phone . '@tmtaxi.system';
+            $usr->email = 'drv' . $this->phone . '@tulpar.system';
             $usr->name = $this->name . ' ' . $this->lastname;
             $usr->phone = $this->phone;
             $usr->password = Hash::make((string) $now);
@@ -52,7 +52,7 @@ class TxDriverProfile extends Model
             $usr->driver_id = $this->id;
             $usr->save();
         } else {
-            $usr->email = 'drv' . $this->phone . '@tmtaxi.system';
+            $usr->email = 'drv' . $this->phone . '@tulpar.system';
             $usr->phone = $this->phone;
             $usr->name = $this->name . ' ' . $this->lastname;
             $usr->password = Hash::make((string) $now);
