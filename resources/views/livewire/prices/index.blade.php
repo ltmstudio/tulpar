@@ -66,7 +66,7 @@
                                                 style="color: #{{ $level->color }}"></i></div>
                                         <input type="number"
                                             class="form-control"wire:model="prices.{{ $car_class->id }}.{{ $shift->id }}.{{ $level->id }}"
-                                            placeholder="Cтоимость {{ $car_class->name }}/{{ $shift->hours }} {{ $shift->state }}/{{ $level->name }}"
+                                            placeholder="{{ $car_class->name }}/{{ $shift->hours }} {{ $shift->state }}/{{ $level->name }}"
                                             value="{{ $prices[$car_class->id][$shift->id][$level->id] ?? '' }}">
                                         <div class="input-group-text">₸</div>
                                     </div>

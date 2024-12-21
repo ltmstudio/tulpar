@@ -49,5 +49,14 @@ class ShiftsSeeder extends Seeder
                 'state' => 'часов'
             ]
         );
+        TxShift::updateOrCreate(
+            [
+                'id' => 5
+            ],
+            [
+                'hours' => 24,
+                'state' => 'часа'
+            ]
+        );
     }
 }

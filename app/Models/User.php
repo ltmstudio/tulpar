@@ -20,6 +20,7 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'phone',
         'role',
         'status',
         'password',
@@ -43,4 +44,13 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+
+    /**
+     * Get the driver associated with the user.
+     */
+    public function driver()
+    {
+        return $this->hasOne(TxDriverProfile::class, 'id', 'driver_id');
+    }
 }

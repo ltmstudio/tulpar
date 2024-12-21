@@ -51,7 +51,7 @@ class UserController extends Controller
                 'message' => 'Смс отправлено',
                 'data' => [
                     'salt' => $sms->salt,
-                    // 'sms' => $sms->sms
+                    'sms' => $sms->sms
                 ]
             ]);
         } catch (ValidationException $e) {

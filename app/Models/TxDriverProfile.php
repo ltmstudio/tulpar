@@ -38,6 +38,46 @@ class TxDriverProfile extends Model
         return TxCarClass::find($this->class_id);
     }
 
+    public function getCarImagesAttribute()
+    {
+        $list = array(
+            $this->car_image_1,
+            $this->car_image_2,
+            $this->car_image_3,
+            $this->car_image_4
+        );
+
+        return array_filter($list, function ($image) {
+            return !is_null($image);
+        });
+    }
+
+    public function getOperationsAttribute()
+    {
+        return TxDriverBalanceLog::where('driver_id', $this->id)->orderBy('created_at', 'DESC')->take(30)->get();
+    }
+
+    public function getShiftOrdersAttribute()
+    {
+        return TxShiftOrder::where('driver_id', $this->id)->orderBy('created_at', 'DESC')->take(30)->get();
+    }
+
+
+    public function getLevelAttribute()
+    {
+        $now = now();
+        $oneWeekEarlier = now()->subWeek();
+        $count = TxShiftOrder::where('driver_id', $this->id)
+            ->whereBetween('created_at', [$oneWeekEarlier, $now])
+            ->count();
+        $level = TxLevel::where('count', '<=', $count)
+            ->orderBy('count', 'desc')
+            ->first();
+        return $level;
+    }
+   
+
+
     public function syncUser()
     {
         $usr =  User::where(['role' => 'DRV', 'driver_id' => $this->id])->first();

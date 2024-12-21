@@ -19,24 +19,28 @@ class DriversComponent extends Component
     //Form Fields
 
     public $phone,
-    $name,
-    $lastname,
-    $avatar,
-    $avatar_select,
-    $car_name,
-    $car_number,
-    $balance,
-    $people = 3,
-    $status,
-    $class_id;
+        $name,
+        $lastname,
+        $avatar,
+        $avatar_select,
+        $car_name,
+        $car_number,
+        $car_images = array(),
+        $balance,
+        $people = 3,
+        $status,
+        $class_id;
 
     public $balance_input;
     public $balance_operations = [];
 
     //Helpers
     public $item_edit_id,
-    $item_delete_id,
-    $item_delete_name;
+        $item_delete_id,
+        $item_delete_name;
+
+    // Search and filters
+    public $search;
 
     public function addItem()
     {
@@ -54,6 +58,7 @@ class DriversComponent extends Component
         $this->phone = $editItem->phone;
         $this->car_name = $editItem->car_name;
         $this->car_number = $editItem->car_number;
+        $this->car_images = $editItem->car_images;
         $this->status = $editItem->status;
         $this->class_id = $editItem->class_id;
         $this->avatar = $editItem->avatar ? str_replace('public/', 'storage/', $editItem->avatar) : null;
@@ -122,47 +127,78 @@ class DriversComponent extends Component
 
         $this->dispatch('close-create-modal');
     }
-    public function deleteProfile(){
-        if($this->item_delete_id == null){
+    public function deleteProfile()
+    {
+        if ($this->item_delete_id == null) {
             return;
         }
         $driverToDelete = TxDriverProfile::find($this->item_delete_id);
-        optional($driverToDelete->user)->delete();
+        $driverToDelete->user->update([
+            'role' => 'CST',
+            'driver_id' => null
+        ]);
+        foreach ($driverToDelete->car_images as $image) {
+            Storage::delete($image);
+        }
         $driverToDelete->delete();
         $this->resetInputFields();
         $this->closeDeleteModal();
     }
-    // public function chargeBalance()
-    // {
-    //     if ($this->item_edit_id != '') {
-    //         $this->validate([
-    //             'balance_input' => 'required|integer',
-    //         ]);
+    public function chargeBalance()
+    {
+        if ($this->item_edit_id != '') {
+            $this->validate([
+                'balance_input' => 'required|integer',
+            ]);
 
-    //         $item =TxDriverProfile::find($this->item_edit_id);
-    //         $item->balance += $this->balance_input;
-    //         $item->save();
+            $item = TxDriverProfile::find($this->item_edit_id);
+            $item->balance += $this->balance_input;
+            $item->save();
 
-    //         $newOperation = new TxDriverBalanceLog;
-    //         $newOperation->driver_id = $item->id;
-    //         $newOperation->operation_value = $this->balance_input;
-    //         $newOperation->result_balance = $item->balance;
-    //         $newOperation->save();
+            $newOperation = new TxDriverBalanceLog;
+            $newOperation->driver_id = $item->id;
+            $newOperation->operation_value = $this->balance_input;
+            $newOperation->result_balance = $item->balance;
+            $newOperation->save();
 
-    //         session()->flash('message', 'Операция добавлена!');
-    //         NodeServerService::sendUpdateProfile($item->id);
-           
-    //         $this->resetValidation();
-    //         $this->balance_input = 0;
-    //         $this->balance = $item->balance;
-    //         $this->balance_operations = $item->operations;
-    //     }
+            session()->flash('message-modal', 'Операция добавлена!');
 
-    // }
+            // TODO обноление баланса
+            // NodeServerService::sendUpdateProfile($item->id);
+
+            $this->resetValidation();
+            $this->balance_input = 0;
+            $this->balance = $item->balance;
+            $this->balance_operations = $item->operations;
+        }
+    }
+
+    public function setSearch() {}
+
+    public function resetSearch()
+    {
+        $this->search = '';
+    }
 
     public function render()
     {
-        $items = TxDriverProfile::paginate(25);
+
+        $query = TxDriverProfile::query();
+        if ($this->search != null && $this->search != '') {
+            $search = $this->search;
+            $searchTerms = explode(' ', $search);
+            foreach ($searchTerms as $term) {
+                $query->where(function ($query) use ($term) {
+                    $query->orWhere('name', 'like', '%' . $term . '%')
+                        ->orWhere('lastname', 'like', '%' . $term . '%')
+                        ->orWhere('phone', 'like', '%' . $term . '%');
+                });
+            }
+        }
+
+
+        $items = $query->paginate(25);
+
         $classes = TxCarClass::all();
         return view('livewire.drivers.index', ['items' => $items, 'classes' => $classes])
             ->extends('layouts.master')
@@ -215,6 +251,7 @@ class DriversComponent extends Component
         $this->avatar_select = '';
         $this->car_name = '';
         $this->car_number = '';
+        $this->car_images = [];
         $this->balance = 0;
         $this->people = 3;
         $this->balance_operations = [];

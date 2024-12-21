@@ -9,18 +9,37 @@
     @endcomponent
 
 
-    <div class="row mb-2">
-        <div class="col-md-6">
-            <div class="mb-3">
-                <button type="button" class="btn btn-success waves-effect waves-light" wire:click="addItem()"><i
-                        class="mdi mdi-plus me-2"></i> Добавить</button>
+    <div class="d-flex justify-content-between">
+        <div class="mb-3">
+            
+        </div>
+        <div class="row row-cols-lg-auto gx-3 gy-2 align-items-center mb-3">
+            <div class="col-12">
+                <label class="visually-hidden" for="search">Введите название</label>
+                <div class="input-group">
+                    <div class="input-group-text"><i class="uil-search"></i></div>
+                    <input type="text" class="form-control" id="search" wire:model="search">
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="d-flex flex-wrap gap-3">
+                    <button type="button" class="btn btn-secondary waves-effect waves-light w-md"
+                        wire:click="setSearch">Применить</button>
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="d-flex flex-wrap gap-3">
+                    <button type="button" class="btn btn-light waves-effect waves-light w-md"
+                        wire:click="resetSearch">Сбросить</button>
+                </div>
             </div>
         </div>
     </div>
 
     @include('livewire.drivers.create')
     @include('livewire.drivers.delete')
-    {{-- @include('livewire.drivers.balance') --}}
+    @include('livewire.drivers.balance')
 
     <style>
         .driver-avatar {
@@ -62,6 +81,7 @@
                         <th>Номер телефона</th>
                         <th>Автомобиль</th>
                         <th>Номер авто</th>
+                        <th>Фото авто</th>
                         <th>Класс</th>
                         <th>Баланс</th>
                         <th>Статус</th>
@@ -84,14 +104,22 @@
                             <td>{{ $item->car_name }}</td>
                             <td>{{ $item->car_number }}</td>
                             <td>
+                                @if (empty($item->car_images))
+                                    <span><i class="text-danger uil-times-circle"></i> Нет фото</span>
+                                @else
+                                    <span><i class="text-success uil-check-circle"></i>
+                                        {{ count($item->car_images) }} фото</span>
+                                @endif
+                            </td>
+                            <td>
                                 @if ($item->class)
                                     {{ $item->class->name }}
                                 @else
                                     --
                                 @endif
                             </td>
-                           
-                            <td>{{ $item->balance }} TMT</td>
+
+                            <td>{{ $item->balance }} ₸</td>
                             <td>
                                 @if ($item->status == 1)
                                     <i class="uil uil-check-circle fs-4" style="color: rgb(0, 209, 0)"></i>
@@ -113,37 +141,37 @@
                                         class="uil uil-trash-alt font-size-18"></i></a> --}}
                             </td>
                         </tr>
-                        @empty
-                            <tr>
-                                <td colspan="11" align="center">Записи во водителям отсутствуют</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
+                    @empty
+                        <tr>
+                            <td colspan="11" align="center">Записи во водителям отсутствуют</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
-
-        {{ $items->links() }}
     </div>
-    @section('script')
-        <script>
-            window.addEventListener('open-create-modal', event => {
-                $('#addItem').modal('show');
-            });
-            window.addEventListener('close-create-modal', event => {
-                $('#addItem').modal('hide');
-            });
-            window.addEventListener('open-balance-modal', event => {
-                $('#balanceModal').modal('show');
-            });
-            window.addEventListener('close-balance-modal', event => {
-                $('#balanceModal').modal('hide');
-            });
-            window.addEventListener('open-delete-modal', event => {
-                $('#deleteConfirm').modal('show');
-            });
-            window.addEventListener('close-delete-modal', event => {
-                $('#deleteConfirm').modal('hide');
-            });
-        </script>
-    @endsection
+
+    {{ $items->links() }}
+</div>
+@section('script')
+    <script>
+        window.addEventListener('open-create-modal', event => {
+            $('#addItem').modal('show');
+        });
+        window.addEventListener('close-create-modal', event => {
+            $('#addItem').modal('hide');
+        });
+        window.addEventListener('open-balance-modal', event => {
+            $('#balanceModal').modal('show');
+        });
+        window.addEventListener('close-balance-modal', event => {
+            $('#balanceModal').modal('hide');
+        });
+        window.addEventListener('open-delete-modal', event => {
+            $('#deleteConfirm').modal('show');
+        });
+        window.addEventListener('close-delete-modal', event => {
+            $('#deleteConfirm').modal('hide');
+        });
+    </script>
+@endsection

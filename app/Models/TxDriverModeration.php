@@ -47,5 +47,39 @@ class TxDriverModeration extends Model
     {
         return $this->belongsTo(TxCatalogCarModel::class, 'car_model_id', 'id');
     }
+
+    public function getCarImagesAttribute() {
+        $list = array(
+            $this->car_image_1,
+            $this->car_image_2,
+            $this->car_image_3,
+            $this->car_image_4
+        );
+
+        return array_filter($list, function($image) {
+            return !is_null($image);
+        });
+    }
     
+    public function getDriverLicenseImagesAttribute() {
+        $list = array(
+            $this->driver_license_front,
+            $this->driver_license_back
+        );
+        
+        return array_filter($list, function($image) {
+            return !is_null($image);
+        });                                                                                     
+    }
+
+    public function getTsPassportImagesAttribute() {
+        $list = array(
+            $this->ts_passport_front,
+            $this->ts_passport_back
+        );
+        
+        return array_filter($list, function($image) {
+            return !is_null($image);
+        });
+    }
 }

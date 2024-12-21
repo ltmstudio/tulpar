@@ -11,6 +11,18 @@ use Illuminate\Support\Facades\Validator;
 
 class ModerationController extends Controller
 {
+
+    public function index()
+    {
+        $user = Auth::user();
+        $moderation = TxDriverModeration::where('user_id', $user->id)->first();
+
+        if (!$moderation) {
+            return response()->json(['message' => 'Moderation record not found'], 404);
+        }
+
+        return response()->json($moderation, 200);
+    }
     public function store(Request $request)
     {
         $user = Auth::user();
@@ -59,7 +71,7 @@ class ModerationController extends Controller
 
         // Загрузка файла
         if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('moderation/user' . $user->id, 'public');
+            $path = $request->file('image')->store('moderation/user' . $user->id);
 
             if ($request->field_key) {
                 $field_key =  $request->field_key;
@@ -84,5 +96,50 @@ class ModerationController extends Controller
         }
 
         return response()->json(['message' => 'No image uploaded'], 400);
+    }
+
+    public function deleteImage(Request $request)
+    {
+        $user = Auth::user();
+
+        $validator = Validator::make($request->all(), [
+            'field_key' => 'required|string',  // Проверка наличия ключа поля
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 400);
+        }
+
+        $field_key = $request->field_key;
+        $moderation = TxDriverModeration::where('user_id', $user->id)->first();
+
+        if (!$moderation || !$moderation->{$field_key}) {
+            return response()->json(['message' => 'Image not found'], 404);
+        }
+
+        // Удаление файла
+        Storage::delete($moderation->{$field_key});
+
+        // Обновление поля в базе данных
+        $moderation->update([
+            $field_key => null,
+        ]);
+
+        return response()->json(['message' => 'Image deleted successfully'], 200);
+    }
+
+    public function setToModeration()
+    {
+        $user = Auth::user();
+
+        $moderation = TxDriverModeration::where('user_id', $user->id)->first();
+
+        if (!$moderation) {
+            return response()->json(['message' => 'Moderation record not found'], 404);
+        }
+
+        $moderation->update(['status' => 'moderation']);
+
+        return response()->json(['message' => 'Status updated to moderation'], 200);
     }
 }

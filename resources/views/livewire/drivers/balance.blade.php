@@ -36,7 +36,7 @@
                         </div>
                         <div class="col-lg-6">
                             <h4 class="card-title mb-3">Текущий баланс</h4>
-                            <p class="mt-3 font-size-20" style="font-weight: 800">{{ $balance }} TMT</p>
+                            <p class="mt-3 font-size-20" style="font-weight: 800">{{ $balance }} ₸</p>
                         </div>
                     </div>
                     <h4 class="card-title mt-3 mb-3">Новая операция</h4>
@@ -57,6 +57,16 @@
                                     операцию</button>
                             </div>
                         </div>
+                        <div class="col-12">
+                            @if (session()->has('message-modal'))
+                                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                    <i class="uil uil-check me-2"></i>
+                                    {{ session('message-modal') }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+                                    </button>
+                                </div>
+                            @endif
+                        </div>
                     </div>
                     <h4 class="card-title mt-5 mb-3">История начислений и списаний</h4>
                     <div class="table-responsive">
@@ -68,6 +78,7 @@
                                     <th style="text-align: end">Сумма</th>
                                     <th>Тип</th>
                                     <th style="text-align: end">Результат</th>
+                                    <th>Заказ-смена</th>
                                     <th>Дата операции</th>
                                 </tr>
                             </thead>
@@ -75,7 +86,7 @@
                                 @forelse ($balance_operations as $oper)
                                     <tr>
                                         <th scope="row">{{ $oper->id }}</th>
-                                        <td align="end">{{ $oper->operation_value }} TMT</td>
+                                        <td align="end">{{ $oper->operation_value }} ₸</td>
                                         <td>
                                             @if ($oper->operation_value >= 0)
                                                 <span class="badge bg-success-subtle text-success">Пополнение</span>
@@ -83,7 +94,14 @@
                                                 <span class="badge bg-danger-subtle text-danger">Списание</span>
                                             @endif
                                         </td>
-                                        <td align="end">{{ $oper->result_balance }} TMT</td>
+                                        <td align="end">{{ $oper->result_balance }} ₸</td>
+                                        <td>
+                                            @if ($oper->shift_order_id)
+                                                {{ $oper->shift_order->class->name . '/' . $oper->shift_order->hours . ' ' . $oper->shift_order->hours_state . '/' . $oper->shift_order->level_name  }}
+                                            @else
+                                                -
+                                            @endif
+                                        </td>
                                         <td>{{ $oper->created_at->translatedFormat('H:i d M. Y') }}</td>
                                     </tr>
                                 @empty

@@ -17,8 +17,6 @@ class CheckUserRoleOrFolder
      */
     public function handle(Request $request, Closure $next)
     {
-        return response()->json(['message' => 'Unauthorized'], 403);
-
         $user = Auth::user();
 
         // Check if the user is authenticated via Sanctum

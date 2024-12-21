@@ -97,6 +97,16 @@
                             </select>
                         </div>
                     </div>
+                    <div class="row">
+                        @foreach ($car_images as $car_image)
+                            <div class="col-lg-3">
+                                <img src="{{ asset(str_replace('public/', 'storage/', $car_image)) }}" alt=""
+                                    class="img-fluid rounded"
+                                    {{-- onclick="showImageModal('{{ url('/file?path=' . $car_image) }}')" --}}
+                                    >
+                            </div>
+                        @endforeach
+                    </div>
                     <h4 class="card-title mb-3 mt-5">Доступ к приложению</h4>
                     <div class="row">
                         <div class="mb-3 col-lg-4">
