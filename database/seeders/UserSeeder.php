@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\User;
 use Illuminate\Database\Seeder;
 
 use Illuminate\Support\Facades\DB;
@@ -16,11 +17,15 @@ class UserSeeder extends Seeder
      */
     public function run()
     {
-        DB::table('users')->insert([
-            'name' => 'Admin',
-            'email' => 'admin@tulpar.kz',
-            'password' => Hash::make('UzhWb1mJAPAv'),
-            'created_at' => now(),
-        ]);
+        User::updateOrCreate(
+            ['email' => 'admin@tulpar.kz'],
+            [
+                'name' => 'Admin',
+                'email' => 'admin@tulpar.kz',
+                'role' => 'ADM',
+                'password' => Hash::make('UzhWb1mJAPAv'),
+                'created_at' => now(),
+            ]
+        );
     }
 }
