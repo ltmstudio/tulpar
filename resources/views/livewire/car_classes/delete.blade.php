@@ -4,14 +4,14 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="deleteConfirmLabel">
-                    Удаление марки автомобиля
+                    Удаление класса поездок
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
                     wire:click="closeDeleteModal">
                 </button>
             </div>
             <div class="modal-body">
-                <p>Вы действительно хотите удалить автомобиль {{ $car_delete_name }}?</p>
+                <p>Вы действительно хотите удалить класс {{ $item_delete_name }}?</p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-light" data-bs-dismiss="modal"

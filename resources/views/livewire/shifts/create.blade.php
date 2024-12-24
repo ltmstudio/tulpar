@@ -12,7 +12,7 @@
                         @endif
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
-                        wire:click="closeShiftModal">
+                        wire:click="closeCreateModal">
                     </button>
                 </div>
                 <div class="modal-body">
@@ -37,7 +37,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-light" data-bs-dismiss="modal"
-                        wire:click="closeShiftModal">Закрыть</button>
+                        wire:click="closeCreateModal">Закрыть</button>
                     <button type="submit" class="btn btn-primary">Сохранить</button>
                 </div>
             </div>

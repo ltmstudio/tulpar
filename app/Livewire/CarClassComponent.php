@@ -81,12 +81,15 @@ class CarClassComponent extends Component
 
         $this->dispatch('close-create-modal');
     }
-    public function deleteProfile()
+    public function deleteItem()
     {
         if ($this->item_delete_id == null) {
             return;
         }
         $itemToDelete = TxCarClass::find($this->item_delete_id);
+        if ($itemToDelete->image) {
+            Storage::delete($itemToDelete->image);
+        }
         $itemToDelete->delete();
         $this->resetInputFields();
         $this->closeDeleteModal();

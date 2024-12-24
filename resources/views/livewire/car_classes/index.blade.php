@@ -19,7 +19,7 @@
     </div>
 
     @include('livewire.car_classes.create')
-    {{-- @include('livewire.profiles.drivers.delete') --}}
+    @include('livewire.car_classes.delete')
 
     <style>
         .driver-avatar {
@@ -81,8 +81,8 @@
                                     class="px-3 text-primary"><i class="uil uil-pen font-size-18"></i></a>
                                 {{-- <a title="Удалить" wire:click= "openDeleteModal({{ $item->id }})"
                                     class="px-3 text-danger"><i class="uil uil-trash font-size-18"></i></a> --}}
-                                {{-- <a wire:click = "openDeleteModal({{ $item->id }})" class="px-3 text-danger"><i
-                                        class="uil uil-trash-alt font-size-18"></i></a> --}}
+                                <a wire:click = "openDeleteModal({{ $item->id }})" class="px-3 text-danger"><i
+                                        class="uil uil-trash-alt font-size-18"></i></a>
                             </td>
                         </tr>
                     @empty
