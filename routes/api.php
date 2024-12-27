@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\ModerationController;
 use App\Http\Controllers\Api\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\OrderController;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,7 +22,10 @@ use Illuminate\Support\Facades\Route;
 
 // App
 Route::get('/app', [AppController::class, 'index']);
+Route::get('/pavel', [AppController::class, 'test']);
 Route::get('/app/localization', [AppController::class, 'localization']);
+Route::get('/app/cities', [AppController::class, 'cities']);
+Route::get('/app/order-types', [AppController::class, 'orderTypes']);
 
 // User
 Route::get('/user', [UserController::class, 'user'])->middleware('auth:sanctum');
@@ -43,7 +47,6 @@ Route::post('/driver/moderation/set', [ModerationController::class, 'setToModera
 Route::post('/driver/moderation/upload_image', [ModerationController::class, 'uploadImage'])->middleware('auth:sanctum');
 Route::post('/driver/moderation/delete_image', [ModerationController::class, 'deleteImage'])->middleware('auth:sanctum');
 
-
 // Driver
 Route::get('/driver/profile', [DriverController::class, 'profile'])->middleware('auth:sanctum');
 Route::get('/driver/level', [DriverController::class, 'level'])->middleware('auth:sanctum');
@@ -51,3 +54,10 @@ Route::get('/driver/shifts', [DriverController::class, 'shifts'])->middleware('a
 Route::post('/driver/shifts/{shift_price_id}', [DriverController::class, 'order'])->middleware('auth:sanctum');
 Route::get('/driver/shift_status', [DriverController::class, 'shiftStatus'])->middleware('auth:sanctum');
 
+// Order
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/orders', [OrderController::class, 'index']);
+    Route::post('/orders', [OrderController::class, 'create']);
+    Route::put('/orders/{id}', [OrderController::class, 'update']);
+    Route::delete('/orders/{id}', [OrderController::class, 'destroy']);
+});

@@ -198,12 +198,24 @@
                                         <span class="text-danger">{{ $message }}</span>
                                     @enderror
                                     <select class="form-select  mb-3" wire:model="class_id">
-                                        <option value="">Выберите класс авто</option>
+                                        <option value="">Не выбрано</option>
                                         @foreach ($classes as $class)
                                             <option value="{{ $class->id }}" @selected($class_id == $class->id)>
                                                 {{ $class->name }}</option>
                                         @endforeach
                                     </select>
+                                    <div class="form-check mb-3">
+                                        <input class="form-check-input" type="checkbox" id="delivery" wire:model="delivery" value="1">
+                                        <label class="form-check-label" for="delivery">
+                                            Доставка
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-3">
+                                        <input class="form-check-input" type="checkbox" id="cargo" wire:model="cargo" value="1">
+                                        <label class="form-check-label" for="cargo">
+                                            Груз
+                                        </label>
+                                    </div>
                                     <button type="button" class="btn btn-success"
                                         wire:click="createDriverProfile()">Подтвердить</button>
                                 </div><!-- end card-body -->

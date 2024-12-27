@@ -3,16 +3,21 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\TxCity;
 use App\Models\TxLang;
+use App\Models\TxRideOrderType;
 use App\Models\TxSystemSetting;
 use App\Models\TxTranslation;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class AppController extends Controller
 {
     public function index(Request $request)
     {
         $langs = TxLang::all();
+        $cities = TxCity::all();
+        $orderTypes = TxRideOrderType::all();
         $platform = $request->query('platform');
         $key = $platform === 'android' ? 'android_version' : ($platform === 'ios' ? 'ios_version' : null);
 
@@ -23,7 +28,9 @@ class AppController extends Controller
                 return response()->json([
                     'success' => true,
                     'appVersion' => $setting->string_val,
-                    'langs' => $langs
+                    'langs' => $langs,
+                    'cities' => $cities,
+                    'orderTypes' => $orderTypes
                 ], 200);
             }
         }
@@ -45,5 +52,17 @@ class AppController extends Controller
         }
 
         return response()->json($result);
+    }
+
+    public function cities()
+    {
+        $cities = TxCity::all();
+        return response()->json($cities);
+    }
+
+    public function orderTypes()
+    {
+        $orderTypes = TxRideOrderType::all();
+        return response()->json($orderTypes);
     }
 }

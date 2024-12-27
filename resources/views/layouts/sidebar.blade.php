@@ -40,6 +40,12 @@
                         <span>Главная</span>
                     </a>
                 </li>
+                <li>
+                    <a href="{{ url('/orders') }}">
+                        <i class="uil-map-pin-alt"></i>
+                        <span>Заказы</span>
+                    </a>
+                </li>
                 <li class="menu-title">Пользователи</li>
                 <li>
                     <a href="{{ url('/drivers') }}">

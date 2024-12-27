@@ -96,14 +96,31 @@
                                 @endforeach
                             </select>
                         </div>
+                        <div class="mb-3 col-lg-6">
+                            <p>
+                                @if ($delivery == 1)
+                                    <i class="uil uil-check-circle fs-6" style="color: rgb(0, 209, 0)"></i>
+                                @else
+                                    <i class="uil uil-times-circle fs-6" style="color: rgb(218, 37, 6)"></i>
+                                @endif
+                                Курьер
+                            </p>
+                            <p>
+                                @if ($cargo == 1)
+                                    <i class="uil uil-check-circle fs-6" style="color: rgb(0, 209, 0)"></i>
+                                @else
+                                    <i class="uil uil-times-circle fs-6" style="color: rgb(218, 37, 6)"></i>
+                                @endif
+                                Грузоперевозки
+                            </p>
+
+                        </div>
                     </div>
                     <div class="row">
                         @foreach ($car_images as $car_image)
                             <div class="col-lg-3">
                                 <img src="{{ asset(str_replace('public/', 'storage/', $car_image)) }}" alt=""
-                                    class="img-fluid rounded"
-                                    {{-- onclick="showImageModal('{{ url('/file?path=' . $car_image) }}')" --}}
-                                    >
+                                    class="img-fluid rounded" {{-- onclick="showImageModal('{{ url('/file?path=' . $car_image) }}')" --}}>
                             </div>
                         @endforeach
                     </div>

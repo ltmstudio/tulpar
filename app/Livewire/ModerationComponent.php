@@ -27,6 +27,8 @@ class ModerationComponent extends Component
     public $status;
     public $reject_message;
     public $class_id;
+    public $delivery = 0;
+    public $cargo = 0;
     public $item_edit_id;
     public $item_delete_id;
     public $item_delete_name;
@@ -91,7 +93,9 @@ class ModerationComponent extends Component
             return;
         }
         $this->validate([
-            'class_id' => 'required|integer|exists:tx_car_classes,id',
+            'class_id' => 'nullable|sometimes|integer|exists:tx_car_classes,id',
+            'delivery' => 'nullable|sometimes|integer|in:0,1',
+            'cargo' => 'nullable|sometimes|integer|in:0,1',
         ]);
         
 
@@ -112,6 +116,8 @@ class ModerationComponent extends Component
         $driver->car_name = optional($moderation->car)->name . ' ' . optional($moderation->carModel)->name;
         $driver->car_number = $moderation->car_gos_number;
         $driver->class_id = $this->class_id;
+        $driver->delivery = $this->delivery ?? 0;
+        $driver->cargo = $this->cargo ?? 0;
 
         foreach ($moderation->car_images as $i => $car_image) {
             $newPath = 'public/' . $car_image;
@@ -242,6 +248,9 @@ class ModerationComponent extends Component
         $this->driver_license_date = '';
         $this->ts_passport_images = [];
         $this->status = '';
+        $this->class_id = null;
+        $this->delivery = 0;
+        $this->cargo = 0;
         $this->reject_message = '';
         $this->item_edit_id = '';
         $this->item_delete_id = '';

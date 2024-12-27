@@ -29,6 +29,8 @@ class DriversComponent extends Component
         $balance,
         $people = 3,
         $status,
+        $delivery,
+        $cargo,
         $class_id;
 
     public $balance_input;
@@ -61,6 +63,8 @@ class DriversComponent extends Component
         $this->car_images = $editItem->car_images;
         $this->status = $editItem->status;
         $this->class_id = $editItem->class_id;
+        $this->delivery = $editItem->delivery;
+        $this->cargo = $editItem->cargo;
         $this->avatar = $editItem->avatar ? str_replace('public/', 'storage/', $editItem->avatar) : null;
         $this->openCreateModal();
     }
@@ -201,8 +205,9 @@ class DriversComponent extends Component
 
         $classes = TxCarClass::all();
         return view('livewire.drivers.index', ['items' => $items, 'classes' => $classes])
-            ->extends('layouts.master')
-            ->section('content');
+            // ->extends('layouts.master')
+            // ->section('content')
+            ;
     }
 
     public function openDeleteModal($i)
@@ -257,6 +262,8 @@ class DriversComponent extends Component
         $this->balance_operations = [];
         $this->status = 1;
         $this->class_id = 1;
+        $this->delivery = 0;
+        $this->cargo = 0;
         $this->item_edit_id = '';
         $this->item_delete_id = '';
         $this->item_delete_name = '';

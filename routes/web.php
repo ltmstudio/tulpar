@@ -8,6 +8,7 @@ use App\Livewire\DriverLevelComponent;
 use App\Livewire\DriversComponent;
 use App\Livewire\HomeComponent;
 use App\Livewire\ModerationComponent;
+use App\Livewire\OrdersComponent;
 use App\Livewire\PricesComponent;
 use App\Livewire\ShiftsComponent;
 use App\Livewire\TranslationsComponent;
@@ -37,6 +38,7 @@ Route::get('/index', function () {
 })->middleware('auth');
 
 Route::get('/access', AccessComponent::class)->middleware('admin');
+Route::get('/orders', OrdersComponent::class)->middleware('admin');
 Route::get('/drivers', DriversComponent::class)->middleware('manager');
 Route::get('/moderation', ModerationComponent::class)->middleware('admin');
 Route::get('/car_classes', CarClassComponent::class)->middleware('manager');

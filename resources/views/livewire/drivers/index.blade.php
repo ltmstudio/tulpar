@@ -11,7 +11,7 @@
 
     <div class="d-flex justify-content-between">
         <div class="mb-3">
-            
+
         </div>
         <div class="row row-cols-lg-auto gx-3 gy-2 align-items-center mb-3">
             <div class="col-12">
@@ -83,6 +83,8 @@
                         <th>Номер авто</th>
                         <th>Фото авто</th>
                         <th>Класс</th>
+                        <th>Курьер</th>
+                        <th>Груз.</th>
                         <th>Баланс</th>
                         <th>Статус</th>
                         <th>Дата регистрации</th>
@@ -118,14 +120,30 @@
                                     --
                                 @endif
                             </td>
+                            <td>
+                                @if ($item->delivery == 1)
+                                    <i class="uil uil-check-circle fs-6" style="color: rgb(0, 209, 0)"></i>
+                                @else
+                                    <i class="uil uil-times-circle fs-6" style="color: rgb(218, 37, 6)"></i>
+                                @endif
+                                {{-- {{ $item->status }} --}}
+                            </td>
+                            <td>
+                                @if ($item->cargo == 1)
+                                    <i class="uil uil-check-circle fs-6" style="color: rgb(0, 209, 0)"></i>
+                                @else
+                                    <i class="uil uil-times-circle fs-6" style="color: rgb(218, 37, 6)"></i>
+                                @endif
+                                {{-- {{ $item->status }} --}}
+                            </td>
 
                             <td>{{ $item->balance }} ₸</td>
                             <td>
                                 @if ($item->status == 1)
-                                    <i class="uil uil-check-circle fs-4" style="color: rgb(0, 209, 0)"></i>
+                                    <i class="uil uil-check-circle fs-6" style="color: rgb(0, 209, 0)"></i>
                                 @endif
                                 @if ($item->status == 0)
-                                    <i class="uil uil-times-circle fs-4" style="color: rgb(218, 37, 6)"></i>
+                                    <i class="uil uil-times-circle fs-6" style="color: rgb(218, 37, 6)"></i>
                                 @endif
                                 {{-- {{ $item->status }} --}}
                             </td>
