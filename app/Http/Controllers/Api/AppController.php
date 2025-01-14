@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\TxCarClass;
 use App\Models\TxCity;
 use App\Models\TxLang;
 use App\Models\TxRideOrderType;
@@ -18,6 +19,7 @@ class AppController extends Controller
         $langs = TxLang::all();
         $cities = TxCity::all();
         $orderTypes = TxRideOrderType::all();
+        $carClasses = TxCarClass::all();
         $platform = $request->query('platform');
         $key = $platform === 'android' ? 'android_version' : ($platform === 'ios' ? 'ios_version' : null);
 
@@ -30,7 +32,8 @@ class AppController extends Controller
                     'appVersion' => $setting->string_val,
                     'langs' => $langs,
                     'cities' => $cities,
-                    'orderTypes' => $orderTypes
+                    'orderTypes' => $orderTypes,
+                    'carClasses' => $carClasses
                 ], 200);
             }
         }

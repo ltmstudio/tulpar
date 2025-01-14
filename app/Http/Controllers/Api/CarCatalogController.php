@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\TxCarClass;
 use App\Models\TxCatalogCar;
 use Illuminate\Http\Request;
 
@@ -59,6 +60,13 @@ class CarCatalogController extends Controller
         return response()->json(
             ['message' => 'No search parameter provided'],
             400
+        );
+    }
+
+    public function carClasses()
+    {
+        return response()->json(
+            TxCarClass::all()
         );
     }
 }

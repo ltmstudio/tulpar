@@ -53,4 +53,9 @@ class User extends Authenticatable
     {
         return $this->hasOne(TxDriverProfile::class, 'id', 'driver_id');
     }
+
+    public function addresses()
+    {
+        return $this->hasMany(TxCustomerAddress::class, 'user_id');
+    }
 }

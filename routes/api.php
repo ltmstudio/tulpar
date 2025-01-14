@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Api\AppController;
 use App\Http\Controllers\Api\CarCatalogController;
+use App\Http\Controllers\Api\CustomerAddressController;
+use App\Http\Controllers\Api\CustomerGeoController;
 use App\Http\Controllers\Api\DriverController;
 use App\Http\Controllers\Api\ModerationController;
 use App\Http\Controllers\Api\UserController;
@@ -30,11 +32,22 @@ Route::get('/app/order-types', [AppController::class, 'orderTypes']);
 // User
 Route::get('/user', [UserController::class, 'user'])->middleware('auth:sanctum');
 
+// Address
+Route::get('/user/address/all', [CustomerAddressController::class, 'getAddresses'])->middleware('auth:sanctum');
+Route::post('/user/address/add', [CustomerAddressController::class, 'addAddress'])->middleware('auth:sanctum');
+Route::delete('/user/address/delete/{id}', [CustomerAddressController::class, 'deleteAddress'])->middleware('auth:sanctum');
+
+// geo
+// Route::post('/customer/geo/geocode', [CustomerGeoController::class, 'fetchLocationName'])->middleware('auth:sanctum');
+Route::post('/customer/geo/geocode', [CustomerGeoController::class, 'fetchLocationNameNominatim'])->middleware('auth:sanctum');
+Route::post('/customer/geo/route', [CustomerGeoController::class, 'fetchRoute'])->middleware('auth:sanctum');
+
 // Car catalog
 Route::get('/catalog/cars', [CarCatalogController::class, 'index']);
 Route::get('/catalog/cars/all', [CarCatalogController::class, 'all']);
 Route::get('/catalog/cars/{id}', [CarCatalogController::class, 'show']);
 Route::get('/catalog/search', [CarCatalogController::class, 'search']);
+Route::get('/catalog/car_classes', [CarCatalogController::class, 'carClasses']);
 
 // Auth
 Route::post('/auth/phone_to_sms', [UserController::class, 'phoneToSms']);

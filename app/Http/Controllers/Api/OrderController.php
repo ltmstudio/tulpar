@@ -11,13 +11,17 @@ use Illuminate\Support\Facades\Auth;
 class OrderController extends Controller
 {
 
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
-        $orders = TxRideOrder::where('user_id', $user->id)
-                    ->orderBy('created_at', 'desc')
-                    ->get();
 
+        $user = Auth::user();
+        $offset = $request->input('offset', 0);
+        $orders = TxRideOrder::where('user_id', $user->id)
+            ->orderBy('created_at', 'desc')
+            ->offset($offset)
+            ->limit(15)
+            ->get();
         return response()->json($orders);
     }
 
@@ -27,10 +31,10 @@ class OrderController extends Controller
         $user = Auth::user();
 
         $data = $request->validate([
-            'phone' => 'required|string',
             'type_id' => 'required|integer|exists:tx_ride_order_types,id',
             'class_id' => 'nullable|exists:tx_car_classes,id',
             'user_cost' => 'required|integer',
+            'user_time' => 'sometimes|nullable|string',
             'people' => 'nullable|integer|min:1',
             'user_comment' => 'nullable|string',
             'driver_comment' => 'nullable|string',
@@ -42,14 +46,15 @@ class OrderController extends Controller
             'city_b_id' => 'nullable|exists:tx_cities,id'
         ]);
 
-        if ((!$request->filled('point_a') || !$request->filled('point_b')) && 
-            (!$request->filled('city_a_id') || !$request->filled('city_b_id'))) {
+        if ((!$request->filled('point_a') || !$request->filled('point_b')) &&
+            (!$request->filled('city_a_id') || !$request->filled('city_b_id'))
+        ) {
             return response()->json(['message' => 'Form is not correctly filled'], 400);
         }
 
         $orderData = array_merge(
             $data,
-            ['user_id' => $user->id]
+            ['user_id' => $user->id, 'phone' => $user->phone]
         );
 
         $order = TxRideOrder::create($orderData);

@@ -16,6 +16,7 @@ class TxRideOrder extends Model
         'user_id',
         'driver_id',
         'user_cost',
+        'user_time',
         'people',
         'user_comment',
         'driver_comment',
@@ -25,6 +26,7 @@ class TxRideOrder extends Model
         'geo_b',
         'city_a_id',
         'city_b_id',
+        'status',
     ];
 
     public function type()
