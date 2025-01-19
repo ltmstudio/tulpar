@@ -34,12 +34,13 @@ class CheckUserRoleOrFolder
 
         // Check if the requested folder matches 'user<$user->id>'
         $userId = $user ? $user->id : null;
-        $requestedFolder = $request->route('user_folder');
+        // $requestedFolder = $request->route('user_folder');
+        $requestedFolder = $request->query('user_folder');
 
         if ($userId && $requestedFolder === 'user' . $userId) {
             return $next($request);
         }
 
-        return response()->json(['message' => 'Unauthorized'], 403);
+        return response()->json(['message' => 'Unauthorized', "user" => optional($user)->id, "folder" => $requestedFolder], 403);
     }
 }

@@ -17,7 +17,7 @@ class OrderController extends Controller
 
         $user = Auth::user();
         $offset = $request->input('offset', 0);
-        $orders = TxRideOrder::where('user_id', $user->id)
+        $orders = TxRideOrder::where('user_id', $user->id)->with('cityA', 'cityB')
             ->orderBy('created_at', 'desc')
             ->offset($offset)
             ->limit(15)
@@ -58,6 +58,7 @@ class OrderController extends Controller
         );
 
         $order = TxRideOrder::create($orderData);
+        $order = TxRideOrder::find($order->id);
 
         return response()->json($order, 201);
     }

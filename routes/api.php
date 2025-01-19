@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\CarCatalogController;
 use App\Http\Controllers\Api\CustomerAddressController;
 use App\Http\Controllers\Api\CustomerGeoController;
 use App\Http\Controllers\Api\DriverController;
+use App\Http\Controllers\Api\DriverOrderController;
 use App\Http\Controllers\Api\ModerationController;
 use App\Http\Controllers\Api\UserController;
 use Illuminate\Http\Request;
@@ -66,6 +67,10 @@ Route::get('/driver/level', [DriverController::class, 'level'])->middleware('aut
 Route::get('/driver/shifts', [DriverController::class, 'shifts'])->middleware('auth:sanctum');
 Route::post('/driver/shifts/{shift_price_id}', [DriverController::class, 'order'])->middleware('auth:sanctum');
 Route::get('/driver/shift_status', [DriverController::class, 'shiftStatus'])->middleware('auth:sanctum');
+
+// Driver orders
+Route::get('/driver/orders', [DriverOrderController::class, 'getNewOrders'])->middleware('auth:sanctum');
+
 
 // Order
 Route::middleware('auth:sanctum')->group(function () {

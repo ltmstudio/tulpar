@@ -34,7 +34,7 @@ class ModerationController extends Controller
             'car_id' => 'nullable|exists:tx_catalog_cars,id',
             'car_model_id' => 'nullable|exists:tx_catalog_car_models,id',
             'car_vin' => 'nullable|string',
-            'car_year' => 'nullable|string',
+            'car_year' => 'nullable|integer',
             'car_gos_number' => 'nullable|string',
             'car_image_1' => 'nullable|string',
             'car_image_2' => 'nullable|string',
