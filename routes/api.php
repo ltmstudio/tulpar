@@ -63,9 +63,12 @@ Route::post('/driver/moderation/delete_image', [ModerationController::class, 'de
 
 // Driver
 Route::get('/driver/profile', [DriverController::class, 'profile'])->middleware('auth:sanctum');
+Route::post('/driver/avatar', [DriverController::class, 'uploadImage'])->middleware('auth:sanctum');
+Route::delete('/driver/avatar', [DriverController::class, 'deleteImage'])->middleware('auth:sanctum');
 Route::get('/driver/level', [DriverController::class, 'level'])->middleware('auth:sanctum');
 Route::get('/driver/shifts', [DriverController::class, 'shifts'])->middleware('auth:sanctum');
 Route::post('/driver/shifts/{shift_price_id}', [DriverController::class, 'order'])->middleware('auth:sanctum');
+Route::get('/driver/shifts_orders', [DriverController::class, 'shiftOrders'])->middleware('auth:sanctum');
 Route::get('/driver/shift_status', [DriverController::class, 'shiftStatus'])->middleware('auth:sanctum');
 
 // Driver orders

@@ -12,6 +12,27 @@ class TxDriverProfile extends Model
 
     public $timestamps = false;
 
+    protected $fillable = [
+        'phone',
+        'name',
+        'lastname',
+        'avatar',
+        'car_name',
+        'car_number',
+        'people',
+        'class_id',
+        'delivery',
+        'cargo',
+        'balance',
+        'status',
+        'car_image_1',
+        'car_image_2',
+        'car_image_3',
+        'car_image_4',
+    ];
+
+    protected $appends = ['class'];
+
     public function getUserAttribute()
     {
         $usr =  User::where(['role' => 'DRV', 'driver_id' => $this->id])->first();
