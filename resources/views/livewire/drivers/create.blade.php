@@ -40,7 +40,7 @@
                                         class="driver-avatar mb-3">
                                 @else
                                     @if ($avatar)
-                                        <img src="{{ asset($avatar) }}" alt="" style="border-radius: 20px"
+                                        <img src="{{ asset('storage/' . $avatar) }}" alt="" style="border-radius: 20px"
                                             class="driver-avatar mb-3">
                                     @endif
                                 @endif

@@ -43,7 +43,8 @@ class OrderController extends Controller
             'geo_a' => 'nullable|string',
             'geo_b' => 'nullable|string',
             'city_a_id' => 'nullable|exists:tx_cities,id',
-            'city_b_id' => 'nullable|exists:tx_cities,id'
+            'city_b_id' => 'nullable|exists:tx_cities,id',
+            'is_delivery' => 'nullable|sometimes|boolean',
         ]);
 
         if ((!$request->filled('point_a') || !$request->filled('point_b')) &&

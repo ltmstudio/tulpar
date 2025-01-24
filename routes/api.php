@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\OrderController;
+use App\Http\Controllers\Api\PayController;
 
 /*
 |--------------------------------------------------------------------------
@@ -71,8 +72,17 @@ Route::post('/driver/shifts/{shift_price_id}', [DriverController::class, 'order'
 Route::get('/driver/shifts_orders', [DriverController::class, 'shiftOrders'])->middleware('auth:sanctum');
 Route::get('/driver/shift_status', [DriverController::class, 'shiftStatus'])->middleware('auth:sanctum');
 
+// Pay
+Route::get('/pay/info', [PayController::class, 'getPayInfo'])->middleware('auth:sanctum');
+
 // Driver orders
 Route::get('/driver/orders', [DriverOrderController::class, 'getNewOrders'])->middleware('auth:sanctum');
+Route::get('/driver/orders/{id}', [DriverOrderController::class, 'showOrder'])->middleware('auth:sanctum');
+Route::post('/driver/orders/{id}', [DriverOrderController::class, 'takeOrder'])->middleware('auth:sanctum');
+Route::post('/driver/order/{id}/close', [DriverOrderController::class, 'closeOrder'])->middleware('auth:sanctum');
+Route::post('/driver/order/{id}/cancel', [DriverOrderController::class, 'cancelOrder'])->middleware('auth:sanctum');
+Route::get('/driver/my_orders', [DriverOrderController::class, 'myOrders'])->middleware('auth:sanctum');
+Route::get('/driver/history_orders', [DriverOrderController::class, 'historyOrders'])->middleware('auth:sanctum');
 
 
 // Order

@@ -26,6 +26,7 @@ class TxRideOrder extends Model
         'geo_b',
         'city_a_id',
         'city_b_id',
+        'is_delivery',
         'status',
     ];
 
@@ -46,7 +47,7 @@ class TxRideOrder extends Model
 
     public function driver()
     {
-        return $this->belongsTo(User::class, 'driver_id');
+        return $this->belongsTo(TxDriverProfile::class, 'driver_id');
     }
 
     public function cityA()

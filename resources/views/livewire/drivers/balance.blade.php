@@ -20,7 +20,7 @@
                             <div class="d-flex flex-row">
                                 @if ($avatar)
                                     <div class="p-2">
-                                        <img src="{{ asset(str_replace('public/', 'storage/', $avatar)) }}"
+                                        <img src="{{ asset('storage/' . $avatar) }}"
                                             alt="" class="driver-avatar mb-3">
                                     </div>
                                 @endif

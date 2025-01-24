@@ -97,7 +97,7 @@
                             <th scope="row">{{ $item->id }}</th>
                             <td>
                                 @if ($item->avatar)
-                                    <img src="{{ asset(str_replace('public/', 'storage/', $item->avatar)) }}"
+                                    <img src="{{ asset('storage/' . $item->avatar) }}"
                                         alt="" class="driver-avatar-sm mb-3">
                                 @endif
                             </td>
