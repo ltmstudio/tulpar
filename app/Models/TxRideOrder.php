@@ -27,6 +27,7 @@ class TxRideOrder extends Model
         'city_a_id',
         'city_b_id',
         'is_delivery',
+        'is_cargo',
         'status',
     ];
 

@@ -26,7 +26,6 @@ use App\Http\Controllers\Api\PayController;
 
 // App
 Route::get('/app', [AppController::class, 'index']);
-Route::get('/pavel', [AppController::class, 'test']);
 Route::get('/app/localization', [AppController::class, 'localization']);
 Route::get('/app/cities', [AppController::class, 'cities']);
 Route::get('/app/order-types', [AppController::class, 'orderTypes']);

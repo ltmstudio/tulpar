@@ -19,6 +19,7 @@ class OrderController extends Controller
         $offset = $request->input('offset', 0);
         $orders = TxRideOrder::where('user_id', $user->id)->with('cityA', 'cityB')
             ->orderBy('created_at', 'desc')
+            ->with('driver')
             ->offset($offset)
             ->limit(15)
             ->get();
@@ -45,6 +46,7 @@ class OrderController extends Controller
             'city_a_id' => 'nullable|exists:tx_cities,id',
             'city_b_id' => 'nullable|exists:tx_cities,id',
             'is_delivery' => 'nullable|sometimes|boolean',
+            'is_cargo' => 'nullable|sometimes|boolean',
         ]);
 
         if ((!$request->filled('point_a') || !$request->filled('point_b')) &&
