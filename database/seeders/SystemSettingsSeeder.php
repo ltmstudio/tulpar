@@ -17,5 +17,6 @@ class SystemSettingsSeeder extends Seeder
         TxSystemSetting::updateOrCreate(['txkey' => 'ios_version'], ['string_val' => '1.0.0']);
         TxSystemSetting::updateOrCreate(['txkey' => 'tupar_pay_link'], ['string_val' => 'https://google.com']);
         TxSystemSetting::updateOrCreate(['txkey' => 'tupar_pay_qr_image'], ['string_val' => 'http://192.168.31.59/storage/pay/tulpar_pay.png']);
+        TxSystemSetting::updateOrCreate(['txkey' => 'tupar_pay_qr_phone'], ['string_val' => '+71234567890']);
     }
 }

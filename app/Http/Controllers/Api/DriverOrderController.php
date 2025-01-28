@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Order;
+use App\Models\TxDriverProfile;
 use App\Models\TxRideOrder;
 use App\Models\TxShiftOrder;
 use Illuminate\Support\Facades\Auth;
@@ -12,11 +13,34 @@ use Illuminate\Support\Facades\Auth;
 class DriverOrderController extends Controller
 {
     public function getNewOrders()
-    {   // optional query parametrs like ?sorting_column=created_at&sorting_direction=desc
+    {
+        $user = Auth::user();
+        $is_not_delivery = null;
+        $is_not_cargo = null;
+        $class_priority = null;
+
+        if ($user->driver_id != null) {
+            $driver_profile = TxDriverProfile::find($user->driver_id);
+            $is_not_delivery = $driver_profile->delivery === 0;
+            $is_not_cargo = $driver_profile->cargo === 0;
+            $class_priority = $driver_profile->class->priority;
+        }
+
+        // optional query parametrs like ?sorting_column=created_at&sorting_direction=desc
         $sorting_column = request('sorting_column', 'created_at');
         $sorting_direction = request('sorting_direction', 'desc');
         // optional query parametrs like ?type_id=1
         $type_id = request('type_id', null);
+        $city_a_id = null;
+        $city_b_id = null;
+
+        if ($type_id != 1 && $type_id != null) {
+            $city_a_id = request('city_a_id', null);
+            $city_b_id = request('city_b_id', null);
+        }
+
+
+
 
         $orders = TxRideOrder::where('status', 'new')
             ->where('driver_id', null)
@@ -24,6 +48,25 @@ class DriverOrderController extends Controller
             ->orderBy($sorting_column, $sorting_direction)
             ->when($type_id, function ($query, $type_id) {
                 return $query->where('type_id', $type_id);
+            })
+            ->when($is_not_delivery, function ($query, $is_not_delivery) {
+                return $query->where('is_delivery', false);
+            })
+            ->when($is_not_cargo, function ($query, $is_not_cargo) {
+                return $query->where('is_cargo', false);
+            })
+            ->when($class_priority, function ($query, $class_priority) {
+                return $query->where(function ($query) use ($class_priority) {
+                    $query->whereHas('class', function ($query) use ($class_priority) {
+                        $query->where('priority', '<=', $class_priority);
+                    })->orWhereNull('class_id');
+                });
+            })
+            ->when($city_a_id, function ($query, $city_a_id) {
+                return $query->where('city_a_id', $city_a_id);
+            })
+            ->when($city_b_id, function ($query, $city_b_id) {
+                return $query->where('city_b_id', $city_b_id);
             })
             ->get();
 

@@ -55,6 +55,13 @@ class CarCatalogController extends Controller
                     }
                 });
             }])->get();
+            if($results->isEmpty()) {
+                return response()->json(
+                    ['message' => 'No results found'],
+                    404
+                );
+            }
+
             return response()->json($results);
         }
         return response()->json(

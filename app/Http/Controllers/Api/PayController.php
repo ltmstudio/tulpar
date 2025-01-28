@@ -11,6 +11,7 @@ class PayController extends Controller
     public function getPayInfo(){
         $pay_link = TxSystemSetting::where('txkey', 'tupar_pay_link')->first();
         $pay_qr_image = TxSystemSetting::where('txkey', 'tupar_pay_qr_image')->first();
+        $pay_qr_phone = TxSystemSetting::where('txkey', 'tupar_pay_qr_phone')->first();
         
         if(!$pay_link || !$pay_qr_image){
             return response()->json([
@@ -20,7 +21,8 @@ class PayController extends Controller
         
         return response()->json([
             'pay_link' => $pay_link->string_val,
-            'pay_qr_image' => $pay_qr_image->string_val
+            'pay_qr_image' => $pay_qr_image->string_val,
+            'pay_qr_phone' => $pay_qr_phone->string_val
         ]);
     }
 }
