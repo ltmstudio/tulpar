@@ -34,8 +34,18 @@ Route::post('logout', [App\Http\Controllers\Auth\LoginController::class, 'logout
 
 Route::get('/', HomeComponent::class)->middleware('auth');
 Route::get('/index', function () {
-    return redirect('/');
+    return redirect('/'); 
 })->middleware('auth');
+
+Route::get('/public_offer', function () {
+    return view('public_offer');
+});
+Route::get('/public_offer/ru', function () {
+    return view('public_offer_ru');
+});
+Route::get('/public_offer/kz', function () {
+    return view('public_offer_kz');
+});
 
 Route::get('/access', AccessComponent::class)->middleware('admin');
 Route::get('/orders', OrdersComponent::class)->middleware('admin');

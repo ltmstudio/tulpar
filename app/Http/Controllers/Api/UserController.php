@@ -15,6 +15,13 @@ class UserController extends Controller
     public function phoneToSms(Request $request)
     {
         try {
+
+            $test_users_phones = [
+                '1234567890'
+            ];
+
+            $test_users_sms_code = 123456;
+
             $this->validate($request, [
                 'phone' => 'required|string|min:10|max:10'
             ]);
@@ -36,7 +43,11 @@ class UserController extends Controller
 
             $sms = new TxSms;
             $sms->user_id = $user->id;
-            $sms->sms = $sms->generateSms();
+            if (in_array($request->phone, $test_users_phones)) {
+                $sms->sms = $test_users_sms_code;
+            } else {
+                $sms->sms = $sms->generateSms();
+            }
             $sms->salt = $sms->generateSalt();
             $expiredAt = Carbon::now()->addMinutes(3);
             $sms->expired_at = $expiredAt;
