@@ -17,7 +17,9 @@ class UserController extends Controller
         try {
 
             $test_users_phones = [
-                '1234567890'
+                '1234567890',
+                '1234567891',
+                '1234567892',
             ];
 
             $test_users_sms_code = 123456;
@@ -47,15 +49,28 @@ class UserController extends Controller
                 $sms->sms = $test_users_sms_code;
             } else {
                 $sms->sms = $sms->generateSms();
+                $sms_url = 'https://smsc.kz/sys/send.php';
+                $sms_params = [
+                    'login' => 'mukagali.orazbak',
+                    'psw' => 'jxma83q2GzZ9HJK',
+                    'phones' => $request->phone,
+                    'mes' => 'TULPAR taxi: ' . $sms->sms,
+                    'sender' => 'TULPAR'
+                ];
+                $query = http_build_query($sms_params);
+                $response = file_get_contents($sms_url . '?' . $query);
+    
+                if (strpos($response, 'OK') === false) {
+                    throw new \Exception('Ошибка отправки смс: ' . $response);
+                }
             }
             $sms->salt = $sms->generateSalt();
+            
             $expiredAt = Carbon::now()->addMinutes(3);
             $sms->expired_at = $expiredAt;
             $sms->active = 1;
             $sms->save();
 
-            // TODO: Uncomment this line to send SMS
-            // NodeServerService::sendSms($request->phone, 'APP: ' . $sms->sms);
 
             return response()->json([
                 'success' => true,

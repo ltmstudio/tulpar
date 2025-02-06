@@ -19,10 +19,15 @@ class DriverOrderController extends Controller
         $is_not_cargo = null;
         $class_priority = null;
 
+        $selected_no_cargo = request('no_cargo', false);
+        $selected_no_delivery = request('no_delivery', false);
+
+        $selected_class = request('class', null);
+
         if ($user->driver_id != null) {
             $driver_profile = TxDriverProfile::find($user->driver_id);
-            $is_not_delivery = $driver_profile->delivery === 0;
-            $is_not_cargo = $driver_profile->cargo === 0;
+            $is_not_delivery = $driver_profile->delivery === 0 || $selected_no_delivery;
+            $is_not_cargo = $driver_profile->cargo === 0  || $selected_no_cargo;
             $class_priority = $driver_profile->class->priority;
         }
 
@@ -67,6 +72,9 @@ class DriverOrderController extends Controller
             })
             ->when($city_b_id, function ($query, $city_b_id) {
                 return $query->where('city_b_id', $city_b_id);
+            })
+            ->when($selected_class, function ($query, $selected_class) {
+                return $query->where('class_id', $selected_class);
             })
             ->get();
 
