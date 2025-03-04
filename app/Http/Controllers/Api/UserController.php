@@ -53,7 +53,7 @@ class UserController extends Controller
                 $sms_params = [
                     'login' => 'mukagali.orazbak',
                     'psw' => 'jxma83q2GzZ9HJK',
-                    'phones' => $request->phone,
+                    'phones' => '8' . $request->phone,
                     'mes' => 'TULPAR taxi: ' . $sms->sms,
                     'sender' => 'TULPAR'
                 ];
