@@ -9,6 +9,7 @@ use App\Livewire\DriversComponent;
 use App\Livewire\HomeComponent;
 use App\Livewire\ModerationComponent;
 use App\Livewire\OrdersComponent;
+use App\Livewire\PayInfoComponent;
 use App\Livewire\PricesComponent;
 use App\Livewire\ShiftsComponent;
 use App\Livewire\TranslationsComponent;
@@ -58,5 +59,6 @@ Route::get('/prices', PricesComponent::class)->middleware('admin');
 Route::get('/cities', CitiesComponent::class)->middleware('admin');
 Route::get('/shifts', ShiftsComponent::class)->middleware('admin');
 Route::get('/translations', TranslationsComponent::class)->middleware('admin');
+Route::get('/pay_info', PayInfoComponent::class)->middleware('admin');
 
 Route::get('/file', [App\Http\Controllers\FileController::class, 'getFile'])->middleware('storage_access');

@@ -10,4 +10,13 @@ class TxSystemSetting extends Model
     use HasFactory;
 
     public $timestamps = false;
+
+    protected $fillable = [
+        'txkey',
+        'string_val',
+        'int_val',
+        'float_val',
+        'json_val',
+        'bool_val',
+    ];
 }

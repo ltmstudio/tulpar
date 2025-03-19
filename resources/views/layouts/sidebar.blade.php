@@ -105,6 +105,12 @@
                     </a>
                 </li>
                 <li>
+                    <a href="{{ url('/pay_info') }}">
+                        <i class="mdi mdi-qrcode-scan"></i>
+                        <span>Платежные данные</span>
+                    </a>
+                </li>
+                <li>
                     <a href="{{ url('/translations') }}">
                         <i class="mdi mdi-translate"></i>
                         <span>Локализация</span>
