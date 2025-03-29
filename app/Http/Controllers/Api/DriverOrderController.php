@@ -28,7 +28,7 @@ class DriverOrderController extends Controller
             $driver_profile = TxDriverProfile::find($user->driver_id);
             $is_not_delivery = $driver_profile->delivery === 0 || $selected_no_delivery;
             $is_not_cargo = $driver_profile->cargo === 0  || $selected_no_cargo;
-            $class_priority = $driver_profile->class->priority;
+            $class_priority = optional($driver_profile->class)->priority;
         }
 
         // optional query parametrs like ?sorting_column=created_at&sorting_direction=desc
@@ -43,8 +43,6 @@ class DriverOrderController extends Controller
             $city_a_id = request('city_a_id', null);
             $city_b_id = request('city_b_id', null);
         }
-
-
 
 
         $orders = TxRideOrder::where('status', 'new')

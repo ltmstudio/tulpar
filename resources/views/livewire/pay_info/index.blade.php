@@ -35,7 +35,10 @@
                                 @if ($image)
                                     <img src="{{ $image->temporaryUrl() }}" alt="Selected Image" class="img-fluid rounded mb-3" style="max-width: 200px;">
                                 @elseif ($pay_qr_image)
-                                    <img src="{{ asset('storage/' . $pay_qr_image) }}" alt="Saved Image" class="img-fluid rounded mb-3" style="max-width: 200px;">
+                                    @php
+                                        $pay_qr_image = str_replace('public/', 'storage/', $pay_qr_image);
+                                    @endphp
+                                    <img src="{{ asset($pay_qr_image) }}" alt="Saved Image" class="img-fluid rounded mb-3" style="max-width: 200px;">
                                 @endif
                             </div>
                         </div>
