@@ -195,6 +195,7 @@ class DriversComponent extends Component
                 $query->where(function ($query) use ($term) {
                     $query->orWhere('name', 'like', '%' . $term . '%')
                         ->orWhere('lastname', 'like', '%' . $term . '%')
+                        ->orWhere('car_number', 'like', '%' . strtoupper($term) . '%')
                         ->orWhere('phone', 'like', '%' . $term . '%');
                 });
             }
