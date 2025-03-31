@@ -224,7 +224,7 @@ class DriverController extends Controller
             ], 403);
         }
 
-        if ($driver->balance <= 0) {
+        if ($driver->balance < $shift_price->price) {
             return response()->json([
                 'success' => false,
                 'message' => 'Недостаточно средств'
