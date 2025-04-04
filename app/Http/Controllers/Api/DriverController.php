@@ -147,12 +147,20 @@ class DriverController extends Controller
             ]);
         }
         $diff = $max - $now;
-        $left = gmdate('H:i:s', round($diff / 1000));
+        $diff_sec = round($diff / 1000);
+        $left = gmdate('H:i:s', $diff_sec);
+
+        $hours = floor($diff_sec / 3600);
+        $minutes = floor(($diff_sec % 3600) / 60);
+        $seconds = $diff_sec % 60;
+        $total_left = sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
+
         return response()->json([
             'now' => $now,
             'max' => $max,
-            'diff_sec' => round($diff / 1000),
+            'diff_sec' => $diff_sec,
             'left' => $left,
+            'total_left' => $total_left,
         ]);
     }
 
