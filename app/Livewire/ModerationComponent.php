@@ -86,7 +86,7 @@ class ModerationComponent extends Component
         $this->resetInputFields();
         $this->dispatch('close-create-modal');
     }
-
+    
     public function createDriverProfile()
     {
         if($this->item_edit_id == null || $this->item_edit_id == ''){
@@ -99,7 +99,7 @@ class ModerationComponent extends Component
             'car_name' => 'required|string|max:255',
             'car_model_name' => 'required|string|max:255',
             'car_vin' => 'required|string|max:17',
-            'car_year' => 'required|integer|min:1900|max:' . date('Y'),
+            'car_year' => 'required|integer',
             'car_gos_number' => 'required|string|max:20',
             'car_images' => 'required|array|min:1',
             'car_images.*' => 'required|string',
@@ -109,7 +109,6 @@ class ModerationComponent extends Component
             'driver_license_date' => 'required|date|before:today',
             'ts_passport_images' => 'required|array|min:1',
             'ts_passport_images.*' => 'required|string',
-            'status' => 'required|string|in:pending,approved,rejected',
             'reject_message' => 'nullable|string|max:500',
             'class_id' => 'nullable|sometimes|integer|exists:tx_car_classes,id',
             'delivery' => 'nullable|sometimes|integer|in:0,1',
