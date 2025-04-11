@@ -61,7 +61,7 @@ class ModerationController extends Controller
         $user = Auth::user();
 
         $validator = Validator::make($request->all(), [
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',  // Проверка формата и размера файла
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:20480',  // Проверка формата и размера файла
             'field_key' => 'nullable|string',  // Проверка наличия ключа поля
         ]);
 
