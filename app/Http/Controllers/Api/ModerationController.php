@@ -60,6 +60,10 @@ class ModerationController extends Controller
     {
         $user = Auth::user();
 
+        if (!$request->file('image')->isValid()) {
+            return response()->json(['error' => 'Файл загружен, но с ошибкой: ' . $request->file('image')->getErrorMessage()], 400);
+        }
+
         $validator = Validator::make($request->all(), [
             'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:20480',  // Проверка формата и размера файла
             'field_key' => 'nullable|string',  // Проверка наличия ключа поля
