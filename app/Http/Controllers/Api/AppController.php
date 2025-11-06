@@ -11,34 +11,48 @@ use App\Models\TxSystemSetting;
 use App\Models\TxTranslation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class AppController extends Controller
 {
     public function index(Request $request)
     {
+        Log::info('index: ' . $request->query('platform'));
+
         $langs = TxLang::all();
         $cities = TxCity::all();
         $orderTypes = TxRideOrderType::all();
         $carClasses = TxCarClass::all();
         $platform = $request->query('platform');
-        $key = $platform === 'android' ? 'android_version' : ($platform === 'ios' ? 'ios_version' : null);
 
+        // Определяем ключ для версии в зависимости от платформы
+        $key = null;
+        if ($platform === 'android') {
+            $key = 'android_version';
+        } elseif ($platform === 'ios') {
+            $key = 'ios_version';
+        } elseif ($platform === 'web') {
+            $key = 'ios_version'; // Используем ios_version для web
+        }
+
+        $appVersion = null;
         if ($key) {
             $setting = TxSystemSetting::where('txkey', $key)->first();
-
             if ($setting) {
-                return response()->json([
-                    'success' => true,
-                    'appVersion' => $setting->string_val,
-                    'langs' => $langs,
-                    'cities' => $cities,
-                    'orderTypes' => $orderTypes,
-                    'carClasses' => $carClasses
-                ], 200);
+                $appVersion = $setting->string_val;
+                Log::info('setting: ' . $setting);
             }
         }
 
-        return response()->json(['success' => false, 'message' => 'Configuration not found'], 404);
+        // Возвращаем данные даже если версия не найдена
+        return response()->json([
+            'success' => true,
+            'appVersion' => $appVersion,
+            'langs' => $langs,
+            'cities' => $cities,
+            'orderTypes' => $orderTypes,
+            'carClasses' => $carClasses
+        ], 200);
     }
 
     public function localization()

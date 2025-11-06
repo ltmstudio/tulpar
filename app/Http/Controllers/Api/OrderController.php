@@ -15,7 +15,7 @@ class OrderController extends Controller
     {
         $user = Auth::user();
 
-        $user = Auth::user();
+        // $user = Auth::user();
         $offset = $request->input('offset', 0);
         $orders = TxRideOrder::where('user_id', $user->id)->with('cityA', 'cityB')
             ->orderBy('created_at', 'desc')

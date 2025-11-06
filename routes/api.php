@@ -54,6 +54,12 @@ Route::get('/catalog/car_classes', [CarCatalogController::class, 'carClasses']);
 Route::post('/auth/phone_to_sms', [UserController::class, 'phoneToSms']);
 Route::post('/auth/login', [UserController::class, 'login']);
 
+Route::get('/auth/google', [UserController::class, 'redirectToGoogle']);
+Route::post('/register/google', [UserController::class, 'registerWithGoogle']);
+Route::post('/register/apple', [UserController::class, 'registerWithApple']);
+Route::get('/auth/google/callback', [UserController::class, 'googleCallback']);
+
+
 // Moderation
 Route::get('/driver/moderation', [ModerationController::class, 'index'])->middleware('auth:sanctum');
 Route::post('/driver/moderation', [ModerationController::class, 'store'])->middleware('auth:sanctum');

@@ -35,7 +35,7 @@ Route::post('logout', [App\Http\Controllers\Auth\LoginController::class, 'logout
 
 Route::get('/', HomeComponent::class)->middleware('auth');
 Route::get('/index', function () {
-    return redirect('/'); 
+    return redirect('/');
 })->middleware('auth');
 
 Route::get('/public_offer', function () {

@@ -8,7 +8,9 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
+use Laravel\Socialite\Facades\Socialite;
 
 class UserController extends Controller
 {
@@ -35,14 +37,21 @@ class UserController extends Controller
             $user =  User::where(['phone' => $request->phone])->first();
 
             if (!$user) {
+                // Проверяем уникальность сгенерированного email
+                $generatedEmail = 'user' . $request->phone . '@tulpar.system';
+                if (User::where('email', $generatedEmail)->exists()) {
+                    $generatedEmail = NULL;
+                }
+
                 $user = User::create(
                     [
                         'name' => 'User' . $request->phone,
                         'phone' => $request->phone . '',
                         'role' => 'CST',
                         'password' => bcrypt('password'),
-                        'email' => 'user' . $request->phone . '@tulpar.system',
-                        'ref' => 0
+                        'email' => $generatedEmail, // Можно заменить на null, если email необязателен
+                        'ref' => 0,
+                        'auth_type' => 'phone', // Указываем тип авторизации
                     ]
                 );
             }
@@ -63,13 +72,13 @@ class UserController extends Controller
                 ];
                 $query = http_build_query($sms_params);
                 $response = file_get_contents($sms_url . '?' . $query);
-    
+
                 if (strpos($response, 'OK') === false) {
                     throw new \Exception('Ошибка отправки смс: ' . $response);
                 }
             }
             $sms->salt = $sms->generateSalt();
-            
+
             $expiredAt = Carbon::now()->addMinutes(3);
             $sms->expired_at = $expiredAt;
             $sms->active = 1;
@@ -98,6 +107,174 @@ class UserController extends Controller
             ], 500);
         }
     }
+
+    public function redirectToGoogle()
+    {
+        try {
+            return Socialite::driver('google')->redirect();
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Ошибка при перенаправлении на Google',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    // Новый метод для регистрации через Google (пример)
+    public function registerWithGoogle(Request $request)
+    {
+        try {
+            $this->validate($request, [
+                'name' => ['required', 'string', 'max:255'],
+                'email' => ['nullable', 'string', 'email', 'max:255', 'unique:users,email'],
+                'google_id' => ['required', 'string'],
+                'auth_type' => ['required', 'in:google'],
+            ]);
+
+            $user = User::where('google_id', $request->google_id)->first();
+
+            if (!$user) {
+                $user = User::create([
+                    'name' => $request->name,
+                    'email' => $request->email ?? null,
+                    'google_id' => $request->google_id,
+                    'auth_type' => 'google',
+                    'role' => 'CST',
+                    'ref' => 0,
+                ]);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Регистрация через Google прошла успешно',
+                'data' => [
+                    'token' => $user->createToken('authToken')->plainTextToken,
+                    'profile' => $user
+                ]
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Ошибка валидации',
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Произошла ошибка',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    // Новый метод для регистрации через Apple (пример)
+    public function registerWithApple(Request $request)
+    {
+        try {
+            $this->validate($request, [
+                'name' => ['required', 'string', 'max:255'],
+                'email' => ['nullable', 'string', 'email', 'max:255', 'unique:users,email'],
+                'apple_id' => ['required', 'string', 'unique:users,apple_id'],
+                'auth_type' => ['required', 'in:apple'],
+            ]);
+
+            $user = User::where('apple_id', $request->apple_id)->first();
+
+            if (!$user) {
+                $user = User::create([
+                    'name' => $request->name,
+                    'email' => $request->email ?? null,
+                    'apple_id' => $request->apple_id,
+                    'auth_type' => 'apple',
+                    'role' => 'CST',
+                    'ref' => 0,
+                ]);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Регистрация через Apple прошла успешно',
+                'data' => [
+                    'token' => $user->createToken('authToken')->plainTextToken,
+                    'profile' => $user
+                ]
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Ошибка валидации',
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Произошла ошибка',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function googleCallback(Request $request)
+    {
+        try {
+            $googleUser = Socialite::driver('google')->user();
+
+            // Проверка на наличие email
+            if (!$googleUser->email) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Email не предоставлен Google аккаунтом',
+                ], 400);
+            }
+
+            $user = User::where('google_id', $googleUser->id)->first();
+
+            if (!$user) {
+                // Проверяем уникальность email
+                $existingUser = User::where('email', $googleUser->email)->first();
+
+                if ($existingUser) {
+                    // Если пользователь существует с этим email, но без google_id
+                    $existingUser->google_id = $googleUser->id;
+                    $existingUser->auth_type = 'google';
+                    $existingUser->save();
+                    $user = $existingUser;
+                } else {
+                    // Создаем нового пользователя
+                    $user = User::create([
+                        'name' => $googleUser->name,
+                        'email' => $googleUser->email ?? null,
+                        'google_id' => $googleUser->id,
+                        'auth_type' => 'google',
+                        'role' => 'CST',
+                        'ref' => 0,
+                    ]);
+                }
+            }
+
+            // Создаем токен и возвращаем
+            $token = $user->createToken('authToken')->plainTextToken;
+
+            // Возвращаем JSON ответ или редирект (в зависимости от ваших потребностей)
+            return response()->json([
+                'success' => true,
+                'message' => 'Авторизация через Google прошла успешно',
+                'data' => [
+                    'token' => $token,
+                    'profile' => $user
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Ошибка авторизации через Google',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
 
 
     public function login(Request $request)
