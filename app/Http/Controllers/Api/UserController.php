@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Laravel\Socialite\Facades\Socialite;
+use Str;
 
 class UserController extends Controller
 {
@@ -142,6 +143,7 @@ class UserController extends Controller
                     'auth_type' => 'google',
                     'role' => 'CST',
                     'ref' => 0,
+                    'password' => bcrypt('password'), // Генерируем случайный пароль
                 ]);
             }
 
@@ -189,6 +191,7 @@ class UserController extends Controller
                     'auth_type' => 'apple',
                     'role' => 'CST',
                     'ref' => 0,
+                    'password' => bcrypt('password'), // Генерируем случайный пароль
                 ]);
             }
 
@@ -249,6 +252,7 @@ class UserController extends Controller
                         'auth_type' => 'google',
                         'role' => 'CST',
                         'ref' => 0,
+                        'password' => bcrypt('password'), // Генерируем случайный пароль
                     ]);
                 }
             }
