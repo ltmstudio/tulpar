@@ -159,8 +159,8 @@ class UserController extends Controller
     {
         try {
             $validator = Validator::make($request->all(), [
-                'access_token' => 'required|string',
-                'id_token' => 'required|string',
+                'access_token' => 'nullable|string',
+                'id_token' => 'nullable|string',
                 'email' => 'required|email',
                 'name' => 'required|string',
                 'google_id' => 'required|string',
