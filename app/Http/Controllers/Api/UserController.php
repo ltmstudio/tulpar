@@ -280,79 +280,48 @@ class UserController extends Controller
                 ], 400);
             }
 
-            $user = $this->findOrCreateGoogleUser(
-                $googleUser->id,
-                $googleUser->email,
-                $googleUser->name
-            );
+            // Находим или создаем пользователя
+            $existingUser = User::where('email', $googleUser->email)->first();
 
-<<<<<<< HEAD
-            if (!$user) {
-                // Проверяем уникальность email
-                $existingUser = User::where('email', $googleUser->email)->first();
-
-                if ($existingUser) {
-                    // Если пользователь существует с этим email, но без google_id
-                    $existingUser->google_id = $googleUser->id;
-                    $existingUser->auth_type = 'google';
-                    $existingUser->save();
-                    $user = $existingUser;
-                } else {
-                    // Создаем нового пользователя
-                    $user = User::create([
-                        'name' => $googleUser->name,
-                        'email' => $googleUser->email ?? null,
-                        'google_id' => $googleUser->id,
-                        'auth_type' => 'google',
-                        'role' => 'CST',
-                        'ref' => 0,
-                        'password' => bcrypt('password'), // Генерируем случайный пароль
-                    ]);
-                }
+            if ($existingUser) {
+                // Если пользователь существует с этим email
+                $existingUser->google_id = $googleUser->id;
+                $existingUser->auth_type = 'google';
+                $existingUser->save();
+                $user = $existingUser;
+            } else {
+                // Создаем нового пользователя
+                $user = User::create([
+                    'name' => $googleUser->name,
+                    'email' => $googleUser->email ?? null,
+                    'google_id' => $googleUser->id,
+                    'auth_type' => 'google',
+                    'role' => 'CST',
+                    'ref' => 0,
+                    'password' => bcrypt(Str::random(16)), // Более безопасный пароль
+                ]);
             }
 
-            // Создаем токен и возвращаем
+            // Создаем токен
             $token = $user->createToken('authToken')->plainTextToken;
 
-             // Возвращаем HTML страницу, которая передает токен в Flutter
-            return response()->view('auth.google_callback', [
-                'token' => $token,
-                'profile' => $user,
-                'success' => true
-=======
+            // Возвращаем JSON ответ
             return response()->json([
                 'success' => true,
                 'message' => 'Авторизация через Google прошла успешно',
                 'data' => [
-                    'token' => $user->createToken('authToken')->plainTextToken,
+                    'token' => $token,
                     'profile' => $user
                 ]
->>>>>>> fbf01f5cf0289f9993be17b9ba5a14b5b9f4669a
             ]);
+
         } catch (\Exception $e) {
-            return response()->view('auth.google_callback', [
+            return response()->json([
                 'success' => false,
-                'error' => $e->getMessage()
-            ]);
+                'message' => 'Ошибка авторизации через Google',
+                'error' => $e->getMessage(),
+            ], 500);
         }
-
-        //     // Возвращаем JSON ответ или редирект (в зависимости от ваших потребностей)
-        //     return response()->json([
-        //         'success' => true,
-        //         'message' => 'Авторизация через Google прошла успешно',
-        //         'data' => [
-        //             'token' => $token,
-        //             'profile' => $user
-        //         ]
-        //     ]);
-
-        // } catch (\Exception $e) {
-        //     return response()->json([
-        //         'success' => false,
-        //         'message' => 'Ошибка авторизации через Google',
-        //         'error' => $e->getMessage(),
-        //     ], 500);
-        // }
     }
 
 
