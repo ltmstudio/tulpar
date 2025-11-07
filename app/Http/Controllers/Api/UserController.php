@@ -155,40 +155,80 @@ class UserController extends Controller
         return $user;
     }
 
-    public function registerWithGoogle(Request $request)
+    public function googleMobileAuth(Request $request)
     {
         try {
-            $this->validate($request, [
-                'name' => ['required', 'string', 'max:255'],
-                'email' => ['nullable', 'string', 'email', 'max:255'],
-                'google_id' => ['required', 'string'],
-                'auth_type' => ['required', 'in:google'],
+            $validator = Validator::make($request->all(), [
+                'access_token' => 'required|string',
+                'id_token' => 'required|string',
+                'email' => 'required|email',
+                'name' => 'required|string',
+                'google_id' => 'required|string',
             ]);
 
-            $user = $this->findOrCreateGoogleUser(
-                $request->google_id,
-                $request->email,
-                $request->name
-            );
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Неверные данные',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            // Валидируем токен через Google API (опционально)
+            // $client = new \Google_Client(['client_id' => env('GOOGLE_CLIENT_ID')]);
+            // $payload = $client->verifyIdToken($request->id_token);
+
+            // if (!$payload) {
+            //     return response()->json([
+            //         'success' => false,
+            //         'message' => 'Неверный токен Google',
+            //     ], 401);
+            // }
+
+            $email = $request->email;
+            $googleId = $request->google_id;
+            $name = $request->name;
+
+            // Находим или создаем пользователя
+            $user = User::where('email', $email)->first();
+
+            if ($user) {
+                // Обновляем google_id если его нет
+                if (!$user->google_id) {
+                    $user->google_id = $googleId;
+                    $user->auth_type = 'google';
+                    $user->save();
+                }
+            } else {
+                // Создаем нового пользователя
+                $user = User::create([
+                    'name' => $name,
+                    'email' => $email,
+                    'google_id' => $googleId,
+                    'auth_type' => 'google',
+                    'role' => 'CST',
+                    'ref' => 0,
+                    'password' => bcrypt(Str::random(16)),
+                ]);
+            }
+
+            // Создаем токен
+            $token = $user->createToken('authToken')->plainTextToken;
 
             return response()->json([
                 'success' => true,
-                'message' => 'Регистрация через Google прошла успешно',
+                'message' => 'Авторизация через Google прошла успешно',
                 'data' => [
-                    'token' => $user->createToken('authToken')->plainTextToken,
+                    'token' => $token,
                     'profile' => $user
                 ]
             ]);
-        } catch (ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Ошибка валидации',
-                'errors' => $e->errors(),
-            ], 422);
+
         } catch (\Exception $e) {
+            \Log::error('Google Mobile Auth Error: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => 'Произошла ошибка',
+                'message' => 'Ошибка авторизации через Google',
                 'error' => $e->getMessage(),
             ], 500);
         }
@@ -269,60 +309,60 @@ class UserController extends Controller
     }
 
     public function googleCallback(Request $request)
-    {
-        try {
-            $googleUser = Socialite::driver('google')->user();
+        {
+            try {
+                $googleUser = Socialite::driver('google')->user();
 
-            if (!$googleUser->email) {
+                if (!$googleUser->email) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Email не предоставлен Google аккаунтом',
+                    ], 400);
+                }
+
+                // Находим или создаем пользователя
+                $existingUser = User::where('email', $googleUser->email)->first();
+
+                if ($existingUser) {
+                    // Если пользователь существует с этим email
+                    $existingUser->google_id = $googleUser->id;
+                    $existingUser->auth_type = 'google';
+                    $existingUser->save();
+                    $user = $existingUser;
+                } else {
+                    // Создаем нового пользователя
+                    $user = User::create([
+                        'name' => $googleUser->name,
+                        'email' => $googleUser->email ?? null,
+                        'google_id' => $googleUser->id,
+                        'auth_type' => 'google',
+                        'role' => 'CST',
+                        'ref' => 0,
+                        'password' => bcrypt(Str::random(16)), // Более безопасный пароль
+                    ]);
+                }
+
+                // Создаем токен
+                $token = $user->createToken('authToken')->plainTextToken;
+
+                // Возвращаем JSON ответ
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Авторизация через Google прошла успешно',
+                    'data' => [
+                        'token' => $token,
+                        'profile' => $user
+                    ]
+                ]);
+
+            } catch (\Exception $e) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Email не предоставлен Google аккаунтом',
-                ], 400);
+                    'message' => 'Ошибка авторизации через Google',
+                    'error' => $e->getMessage(),
+                ], 500);
             }
-
-            // Находим или создаем пользователя
-            $existingUser = User::where('email', $googleUser->email)->first();
-
-            if ($existingUser) {
-                // Если пользователь существует с этим email
-                $existingUser->google_id = $googleUser->id;
-                $existingUser->auth_type = 'google';
-                $existingUser->save();
-                $user = $existingUser;
-            } else {
-                // Создаем нового пользователя
-                $user = User::create([
-                    'name' => $googleUser->name,
-                    'email' => $googleUser->email ?? null,
-                    'google_id' => $googleUser->id,
-                    'auth_type' => 'google',
-                    'role' => 'CST',
-                    'ref' => 0,
-                    'password' => bcrypt(Str::random(16)), // Более безопасный пароль
-                ]);
-            }
-
-            // Создаем токен
-            $token = $user->createToken('authToken')->plainTextToken;
-
-            // Возвращаем JSON ответ
-            return response()->json([
-                'success' => true,
-                'message' => 'Авторизация через Google прошла успешно',
-                'data' => [
-                    'token' => $token,
-                    'profile' => $user
-                ]
-            ]);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Ошибка авторизации через Google',
-                'error' => $e->getMessage(),
-            ], 500);
         }
-    }
 
 
 
