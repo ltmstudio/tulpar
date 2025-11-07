@@ -170,29 +170,55 @@ class UserController extends Controller
         }
     }
 
-    // Новый метод для регистрации через Apple (пример)
+    // Новый метод для регистрации через Apple (улучшенная версия)
     public function registerWithApple(Request $request)
     {
         try {
             $this->validate($request, [
                 'name' => ['required', 'string', 'max:255'],
-                'email' => ['nullable', 'string', 'email', 'max:255', 'unique:users,email'],
-                'apple_id' => ['required', 'string', 'unique:users,apple_id'],
+                'email' => ['nullable', 'string', 'email', 'max:255'],
+                'apple_id' => ['required', 'string'],
                 'auth_type' => ['required', 'in:apple'],
             ]);
 
+            // Проверяем, существует ли пользователь с таким apple_id
             $user = User::where('apple_id', $request->apple_id)->first();
 
             if (!$user) {
-                $user = User::create([
-                    'name' => $request->name,
-                    'email' => $request->email ?? null,
-                    'apple_id' => $request->apple_id,
-                    'auth_type' => 'apple',
-                    'role' => 'CST',
-                    'ref' => 0,
-                    'password' => bcrypt('password'), // Генерируем случайный пароль
-                ]);
+                // Если пользователь не найден по apple_id, проверяем по email
+                if ($request->email) {
+                    $existingUser = User::where('email', $request->email)->first();
+
+                    if ($existingUser) {
+                        // Если пользователь существует с этим email, но без apple_id
+                        $existingUser->apple_id = $request->apple_id;
+                        $existingUser->auth_type = 'apple';
+                        $existingUser->save();
+                        $user = $existingUser;
+                    } else {
+                        // Создаем нового пользователя
+                        $user = User::create([
+                            'name' => $request->name,
+                            'email' => $request->email ?? null,
+                            'apple_id' => $request->apple_id,
+                            'auth_type' => 'apple',
+                            'role' => 'CST',
+                            'ref' => 0,
+                            'password' => bcrypt('password'), // Генерируем случайный пароль
+                        ]);
+                    }
+                } else {
+                    // Создаем нового пользователя без email (Apple может не предоставить email)
+                    $user = User::create([
+                        'name' => $request->name,
+                        'email' => null,
+                        'apple_id' => $request->apple_id,
+                        'auth_type' => 'apple',
+                        'role' => 'CST',
+                        'ref' => 0,
+                        'password' => bcrypt('password'),
+                    ]);
+                }
             }
 
             return response()->json([
@@ -260,23 +286,36 @@ class UserController extends Controller
             // Создаем токен и возвращаем
             $token = $user->createToken('authToken')->plainTextToken;
 
-            // Возвращаем JSON ответ или редирект (в зависимости от ваших потребностей)
-            return response()->json([
-                'success' => true,
-                'message' => 'Авторизация через Google прошла успешно',
-                'data' => [
-                    'token' => $token,
-                    'profile' => $user
-                ]
+             // Возвращаем HTML страницу, которая передает токен в Flutter
+            return response()->view('auth.google_callback', [
+                'token' => $token,
+                'profile' => $user,
+                'success' => true
             ]);
-
         } catch (\Exception $e) {
-            return response()->json([
+            return response()->view('auth.google_callback', [
                 'success' => false,
-                'message' => 'Ошибка авторизации через Google',
-                'error' => $e->getMessage(),
-            ], 500);
+                'error' => $e->getMessage()
+            ]);
         }
+
+        //     // Возвращаем JSON ответ или редирект (в зависимости от ваших потребностей)
+        //     return response()->json([
+        //         'success' => true,
+        //         'message' => 'Авторизация через Google прошла успешно',
+        //         'data' => [
+        //             'token' => $token,
+        //             'profile' => $user
+        //         ]
+        //     ]);
+
+        // } catch (\Exception $e) {
+        //     return response()->json([
+        //         'success' => false,
+        //         'message' => 'Ошибка авторизации через Google',
+        //         'error' => $e->getMessage(),
+        //     ], 500);
+        // }
     }
 
 

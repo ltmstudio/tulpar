@@ -54,14 +54,12 @@ Route::get('/catalog/car_classes', [CarCatalogController::class, 'carClasses']);
 Route::post('/auth/phone_to_sms', [UserController::class, 'phoneToSms']);
 Route::post('/auth/login', [UserController::class, 'login']);
 
-Route::get('/auth/google', [UserController::class, 'redirectToGoogle'])
-    ->middleware(['web', 'throttle:api']);
+Route::get('/auth/google', [UserController::class, 'redirectToGoogle'])->middleware(['web', 'throttle:api']);
+Route::get('/auth/google/callback', [UserController::class, 'googleCallback'])->middleware(['web', 'throttle:api']);
 
-Route::get('/auth/google/callback', [UserController::class, 'googleCallback'])
-    ->middleware(['web', 'throttle:api']);
+// Route::post('/register/google', [UserController::class, 'registerWithGoogle']);
 
-Route::post('/register/google', [UserController::class, 'registerWithGoogle']);
-Route::post('/register/apple', [UserController::class, 'registerWithApple']);
+// Route::post('/register/apple', [UserController::class, 'registerWithApple']);
 
 
 
