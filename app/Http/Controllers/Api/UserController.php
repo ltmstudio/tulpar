@@ -122,30 +122,54 @@ class UserController extends Controller
         }
     }
 
-    // Новый метод для регистрации через Google (пример)
+    private function findOrCreateGoogleUser($googleId, $email, $name)
+    {
+        $user = User::where('google_id', $googleId)->first();
+
+        if (!$user) {
+            $existingEmailUser = null;
+            if ($email) {
+                $existingEmailUser = User::where('email', $email)->first();
+            }
+
+            if ($existingEmailUser) {
+                $existingEmailUser->google_id = $googleId;
+                if ($existingEmailUser->auth_type === 'phone') {
+                    $existingEmailUser->auth_type = 'google';
+                }
+                $existingEmailUser->save();
+                $user = $existingEmailUser;
+            } else {
+                $user = User::create([
+                    'name' => $name,
+                    'email' => $email ?? null,
+                    'google_id' => $googleId,
+                    'auth_type' => 'google',
+                    'role' => 'CST',
+                    'ref' => 0,
+                    'password' => bcrypt('password'),
+                ]);
+            }
+        }
+
+        return $user;
+    }
+
     public function registerWithGoogle(Request $request)
     {
         try {
             $this->validate($request, [
                 'name' => ['required', 'string', 'max:255'],
-                'email' => ['nullable', 'string', 'email', 'max:255', 'unique:users,email'],
+                'email' => ['nullable', 'string', 'email', 'max:255'],
                 'google_id' => ['required', 'string'],
                 'auth_type' => ['required', 'in:google'],
             ]);
 
-            $user = User::where('google_id', $request->google_id)->first();
-
-            if (!$user) {
-                $user = User::create([
-                    'name' => $request->name,
-                    'email' => $request->email ?? null,
-                    'google_id' => $request->google_id,
-                    'auth_type' => 'google',
-                    'role' => 'CST',
-                    'ref' => 0,
-                    'password' => bcrypt('password'), // Генерируем случайный пароль
-                ]);
-            }
+            $user = $this->findOrCreateGoogleUser(
+                $request->google_id,
+                $request->email,
+                $request->name
+            );
 
             return response()->json([
                 'success' => true,
@@ -223,7 +247,6 @@ class UserController extends Controller
         try {
             $googleUser = Socialite::driver('google')->user();
 
-            // Проверка на наличие email
             if (!$googleUser->email) {
                 return response()->json([
                     'success' => false,
@@ -231,41 +254,17 @@ class UserController extends Controller
                 ], 400);
             }
 
-            $user = User::where('google_id', $googleUser->id)->first();
+            $user = $this->findOrCreateGoogleUser(
+                $googleUser->id,
+                $googleUser->email,
+                $googleUser->name
+            );
 
-            if (!$user) {
-                // Проверяем уникальность email
-                $existingUser = User::where('email', $googleUser->email)->first();
-
-                if ($existingUser) {
-                    // Если пользователь существует с этим email, но без google_id
-                    $existingUser->google_id = $googleUser->id;
-                    $existingUser->auth_type = 'google';
-                    $existingUser->save();
-                    $user = $existingUser;
-                } else {
-                    // Создаем нового пользователя
-                    $user = User::create([
-                        'name' => $googleUser->name,
-                        'email' => $googleUser->email ?? null,
-                        'google_id' => $googleUser->id,
-                        'auth_type' => 'google',
-                        'role' => 'CST',
-                        'ref' => 0,
-                        'password' => bcrypt('password'), // Генерируем случайный пароль
-                    ]);
-                }
-            }
-
-            // Создаем токен и возвращаем
-            $token = $user->createToken('authToken')->plainTextToken;
-
-            // Возвращаем JSON ответ или редирект (в зависимости от ваших потребностей)
             return response()->json([
                 'success' => true,
                 'message' => 'Авторизация через Google прошла успешно',
                 'data' => [
-                    'token' => $token,
+                    'token' => $user->createToken('authToken')->plainTextToken,
                     'profile' => $user
                 ]
             ]);
