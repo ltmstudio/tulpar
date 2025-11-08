@@ -122,39 +122,6 @@ class UserController extends Controller
         }
     }
 
-    private function findOrCreateGoogleUser($googleId, $email, $name)
-    {
-        $user = User::where('google_id', $googleId)->first();
-
-        if (!$user) {
-            $existingEmailUser = null;
-            if ($email) {
-                $existingEmailUser = User::where('email', $email)->first();
-            }
-
-            if ($existingEmailUser) {
-                $existingEmailUser->google_id = $googleId;
-                if ($existingEmailUser->auth_type === 'phone') {
-                    $existingEmailUser->auth_type = 'google';
-                }
-                $existingEmailUser->save();
-                $user = $existingEmailUser;
-            } else {
-                $user = User::create([
-                    'name' => $name,
-                    'email' => $email ?? null,
-                    'google_id' => $googleId,
-                    'auth_type' => 'google',
-                    'role' => 'CST',
-                    'ref' => 0,
-                    'password' => bcrypt('password'),
-                ]);
-            }
-        }
-
-        return $user;
-    }
-
     public function googleMobileAuth(Request $request)
     {
         try {
@@ -173,17 +140,6 @@ class UserController extends Controller
                     'errors' => $validator->errors()
                 ], 422);
             }
-
-            // Валидируем токен через Google API (опционально)
-            // $client = new \Google_Client(['client_id' => env('GOOGLE_CLIENT_ID')]);
-            // $payload = $client->verifyIdToken($request->id_token);
-
-            // if (!$payload) {
-            //     return response()->json([
-            //         'success' => false,
-            //         'message' => 'Неверный токен Google',
-            //     ], 401);
-            // }
 
             $email = $request->email;
             $googleId = $request->google_id;
