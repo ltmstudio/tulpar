@@ -130,6 +130,7 @@ class UserController extends Controller
                 'id_token' => 'nullable|string',
                 'email' => 'required|email',
                 'name' => 'required|string',
+                'phone' => 'nullable|string|min:4|max:20',
                 'google_id' => 'required|string',
             ]);
 
@@ -144,7 +145,7 @@ class UserController extends Controller
             $email = $request->email;
             $googleId = $request->google_id;
             $name = $request->name;
-
+            $phone = $request->phone;
             // Находим или создаем пользователя
             $user = User::where('email', $email)->first();
 
@@ -153,6 +154,10 @@ class UserController extends Controller
                 if (!$user->google_id) {
                     $user->google_id = $googleId;
                     $user->auth_type = 'google';
+                    $user->save();
+                }
+                if ($phone) {
+                    $user->phone = $phone;
                     $user->save();
                 }
             } else {
@@ -166,6 +171,10 @@ class UserController extends Controller
                     'ref' => 0,
                     'password' => bcrypt(Str::random(16)),
                 ]);
+                if ($phone) {
+                    $user->phone = $phone;
+                    $user->save();
+                }
             }
 
             // Создаем токен
