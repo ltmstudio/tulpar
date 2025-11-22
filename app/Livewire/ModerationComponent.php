@@ -134,7 +134,7 @@ class ModerationComponent extends Component
         $driver->lastname = $moderation->lastname;
         $driver->car_name = optional($moderation->car)->name . ' ' . optional($moderation->carModel)->name;
         $driver->car_number = $moderation->car_gos_number;
-        $driver->class_id = $this->class_id;
+        $driver->class_id = $this->class_id ?? 1; // Устанавливаем значение по умолчанию, если class_id не выбран
         $driver->delivery = $this->delivery ?? 0;
         $driver->cargo = $this->cargo ?? 0;
 

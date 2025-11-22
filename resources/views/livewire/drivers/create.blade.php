@@ -90,6 +90,7 @@
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
                             <select class="form-select" wire:model="class_id">
+                                <option value="">Не выбран (будет использован класс по умолчанию)</option>
                                 @foreach ($classes as $class)
                                     <option value="{{ $class->id }}" @selected($class_id == $class->id)>
                                         {{ $class->name }}</option>
