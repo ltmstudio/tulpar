@@ -282,6 +282,13 @@ class DriverOrderController extends Controller
             ], 401);
         }
 
+        if ($user->driver->status == 0) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Ошибка авторизации'
+            ], 401);
+        }
+
         $orders = TxRideOrder::where('driver_id', $user->driver_id)
             ->where('status', 'new')
             ->with(['cityA', 'cityB', 'class'])
