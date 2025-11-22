@@ -8,9 +8,12 @@ use App\Models\TxDriverProfile;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class ModerationComponent extends Component
 {
+    use WithPagination;
+
     public $name;
     public $lastname;
     public $birthdate;
@@ -19,11 +22,11 @@ class ModerationComponent extends Component
     public $car_vin;
     public $car_year;
     public $car_gos_number;
-    public $car_images = array();
+    public $car_images = [];
     public $driver_license_number;
-    public $driver_license_images = array();
+    public $driver_license_images = [];
     public $driver_license_date;
-    public $ts_passport_images = array();
+    public $ts_passport_images = [];
     public $status;
     public $reject_message;
     public $class_id;
@@ -32,6 +35,7 @@ class ModerationComponent extends Component
     public $item_edit_id;
     public $item_delete_id;
     public $item_delete_name;
+    public $statusFilter = 'moderation';
 
     public function addItem()
     {
@@ -72,7 +76,6 @@ class ModerationComponent extends Component
             'reject_message' => 'required|string',
         ]);
         
-
         $moderation = TxDriverModeration::find($this->item_edit_id);
         $moderation->update([
             'status' => 'rejected',
@@ -115,7 +118,6 @@ class ModerationComponent extends Component
             'cargo' => 'nullable|sometimes|integer|in:0,1',
         ]);
         
-
         $moderation = TxDriverModeration::find($this->item_edit_id);
 
         $driverUser = $moderation->user;
@@ -150,7 +152,6 @@ class ModerationComponent extends Component
 
         $moderation->status = 'approved';
         $moderation->save();
-
 
         session()->flash('message', 'Модерация обновлена! Профиль водителя создан');
 
@@ -273,10 +274,18 @@ class ModerationComponent extends Component
         $this->item_delete_id = '';
         $this->item_delete_name = '';
     }
+
     public function render()
     {
-        $items = TxDriverModeration::all();
+        $query = TxDriverModeration::query();
+
+        if ($this->statusFilter) {
+            $query->where('status', $this->statusFilter);
+        }
+
+        $items = $query->paginate(20);
         $classes = TxCarClass::all();
+
         return view('livewire.moderation.index', ['items' => $items, 'classes' => $classes])
             ->extends('layouts.master')
             ->section('content');

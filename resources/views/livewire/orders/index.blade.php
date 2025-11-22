@@ -73,7 +73,7 @@
                             <td>+7 {{ $item->phone }}</td>
                             <td>{{ optional($item->type)->name ?? '--' }}</td>
                             <td>
-                                @if ($item->class_id == 1)
+                                @if ($item->type_id == 1)
                                     {{ $item->point_a ?? '--' }}
                                     @if ($item->geo_a)
                                         <i class="uil uil-map-marker-alt fs-6" style="color: rgb(0, 209, 0)"></i>

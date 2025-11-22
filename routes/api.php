@@ -54,6 +54,17 @@ Route::get('/catalog/car_classes', [CarCatalogController::class, 'carClasses']);
 Route::post('/auth/phone_to_sms', [UserController::class, 'phoneToSms']);
 Route::post('/auth/login', [UserController::class, 'login']);
 
+// Route::get('/auth/google', [UserController::class, 'redirectToGoogle'])->middleware(['web', 'throttle:api']); //web не используется для google йесли на будущее
+// Route::get('/auth/google/callback', [UserController::class, 'googleCallback'])->middleware(['web', 'throttle:api']); //web не используется для google йесли на будущее
+Route::post('/auth/google/mobile', [UserController::class, 'googleMobileAuth']);
+
+
+
+// Route::post('/register/apple', [UserController::class, 'registerWithApple']);
+
+
+
+
 // Moderation
 Route::get('/driver/moderation', [ModerationController::class, 'index'])->middleware('auth:sanctum');
 Route::post('/driver/moderation', [ModerationController::class, 'store'])->middleware('auth:sanctum');

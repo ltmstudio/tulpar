@@ -16,7 +16,7 @@
         .addItem .modal-backdrop.show {
             z-index: 1040;
         }
-        
+
         #addItem {
             z-index: 1041;
         }
@@ -28,19 +28,13 @@
         #imageModal {
             z-index: 1051;
         }
+
+        .form-control {
+            max-width: 300px;
+        }
     </style>
-    {{-- 
-    <div class="row mb-2">
-        <div class="col-md-6">
-            <div class="mb-3">
-                <button type="button" class="btn btn-primary waves-effect waves-light" wire:click="addItem()"><i
-                        class="mdi mdi-plus me-2"></i> Добавить</button>
-            </div>
-        </div>
-    </div> --}}
 
     @include('livewire.moderation.create')
-
 
     @if (session()->has('message'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -50,6 +44,19 @@
             </button>
         </div>
     @endif
+
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <label for="statusFilter">Фильтр по статусу</label>
+            <select class="form-control" wire:model.live="statusFilter">
+                <option value="">Все статусы</option>
+                <option value="preparation">Подготовка</option>
+                <option value="moderation">Модерация</option>
+                <option value="approved">Одобрено</option>
+                <option value="rejected">Отклонено</option>
+            </select>
+        </div>
+    </div>
 
     <div class="row" wire:loading.class="opacity-75">
         <div class="table-responsive">
@@ -117,12 +124,6 @@
                                 @endif
                             </td>
                             <td>
-                                {{-- №{{ $moderation->driver_license_number ?? '---' }} <br>
-                                @if ($moderation->driver_license_date)
-                                    {{ \Carbon\Carbon::parse($moderation->driver_license_date)->format('d M Y') }} <br>
-                                @else
-                                    Дата ВУ не указана <br>
-                                @endif --}}
                                 @if (empty($moderation->driver_license_images))
                                     <span><i class="text-danger uil-times-circle"></i> Нет фото</span>
                                 @else
@@ -130,7 +131,6 @@
                                         {{ count($moderation->driver_license_images) }} фото</span>
                                 @endif
                             </td>
-
                             <td>
                                 @if (empty($moderation->ts_passport_images))
                                     <span><i class="text-danger uil-times-circle"></i> Нет фото</span>
@@ -138,10 +138,8 @@
                                     <span><i class="text-success uil-check-circle"></i>
                                         {{ count($moderation->ts_passport_images) }} фото</span>
                                 @endif
-
                             </td>
                             <td>
-                                {{-- preparation, moderation, approved, rejected --}}
                                 @switch($moderation->status)
                                     @case('preparation')
                                         <span class="badge bg-info">Подготовка</span>
@@ -172,41 +170,47 @@
                         </tr>
                         @empty
                             <tr>
-                                <td colspan="21" align="center">Модерации отсутствуют</td>
+                                <td colspan="10" align="center">Модерации отсутствуют</td>
                             </tr>
                         @endforelse
                     </tbody>
                 </table>
             </div>
         </div>
+
+        <div class="row mt-3">
+            <div class="col">
+                {{ $items->links() }}
+            </div>
+        </div>
+
+        @section('script')
+            <script>
+                window.addEventListener('open-create-modal', event => {
+                    $('#addItem').modal('show');
+                });
+                window.addEventListener('close-create-modal', event => {
+                    $('#addItem').modal('hide');
+                });
+                window.addEventListener('open-delete-modal', event => {
+                    $('#deleteConfirm').modal('show');
+                });
+                window.addEventListener('close-delete-modal', event => {
+                    $('#deleteConfirm').modal('hide');
+                });
+
+                function showImageModal(imageUrl) {
+                    var modalImage = document.getElementById('modalImage');
+                    modalImage.src = imageUrl;
+                    var imageModal = new bootstrap.Modal(document.getElementById('imageModal'));
+                    imageModal.show();
+                    setTimeout(() => {
+                        var backdrop = document.querySelector('.modal-backdrop.fade.show:last-of-type');
+                        if (backdrop) {
+                            backdrop.style.zIndex = 1050;
+                        }
+                    }, 50);
+                }
+            </script>
+        @endsection
     </div>
-
-    @section('script')
-        <script>
-            window.addEventListener('open-create-modal', event => {
-                $('#addItem').modal('show');
-            });
-            window.addEventListener('close-create-modal', event => {
-                $('#addItem').modal('hide');
-            });
-            window.addEventListener('open-delete-modal', event => {
-                $('#deleteConfirm').modal('show');
-            });
-            window.addEventListener('close-delete-modal', event => {
-                $('#deleteConfirm').modal('hide');
-            });
-
-            function showImageModal(imageUrl) {
-                var modalImage = document.getElementById('modalImage');
-                modalImage.src = imageUrl;
-                var imageModal = new bootstrap.Modal(document.getElementById('imageModal'));
-                imageModal.show();
-                setTimeout(() => {
-                    var backdrop = document.querySelector('.modal-backdrop.fade.show:last-of-type');
-                    if (backdrop) {
-                        backdrop.style.zIndex = 1050;
-                    }
-                }, 50);
-            }
-        </script>
-    @endsection

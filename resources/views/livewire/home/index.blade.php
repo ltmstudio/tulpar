@@ -73,27 +73,29 @@
                             </div>
                             <div class="card-body">
                                 <div class="row">
-                                    @foreach ($result[$period] as $res)
-                                        <div class="col-lg-6">
-                                            <div class="card card-body">
-                                                @php
-                                                    $item = $res['car_class'];
-                                                @endphp
-                                                <div class="d-flex align-items-center">
-                                                    <div class="d-flex flex-row">
-                                                        @if ($item->image)
-                                                            <img src="{{ asset(str_replace('public/', 'storage/', $item->image)) }}"
-                                                                alt="" class="driver-avatar-sm mb-3">
-                                                        @endif
-                                                        <div class="d-flex flex-column">
-                                                            <h5 class="font-size-15">{{ $item->name }}</h5>
-                                                            <h4 class="mb-1 mt-1">{{ $res['count'] }}</h4>
+                                    @if (isset($result[$period]))
+                                        @foreach ($result[$period] as $res)
+                                            <div class="col-lg-6">
+                                                <div class="card card-body">
+                                                    @php
+                                                        $item = $res['car_class'];
+                                                    @endphp
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="d-flex flex-row">
+                                                            @if ($item->image)
+                                                                <img src="{{ asset(str_replace('public/', 'storage/', $item->image)) }}"
+                                                                    alt="" class="driver-avatar-sm mb-3">
+                                                            @endif
+                                                            <div class="d-flex flex-column">
+                                                                <h5 class="font-size-15">{{ $item->name }}</h5>
+                                                                <h4 class="mb-1 mt-1">{{ $res['count'] }}</h4>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    @endforeach
+                                        @endforeach
+                                    @endif
                                 </div>
                             </div>
                         </div>
