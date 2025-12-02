@@ -60,43 +60,50 @@ Route::post('/auth/google/mobile', [UserController::class, 'googleMobileAuth']);
 
 
 
-// Route::post('/register/apple', [UserController::class, 'registerWithApple']);
+Route::post('/auth/apple/mobile', [UserController::class, 'appleMobileAuth']);
 
 
 
 
 // Moderation
-Route::get('/driver/moderation', [ModerationController::class, 'index'])->middleware('auth:sanctum');
-Route::post('/driver/moderation', [ModerationController::class, 'store'])->middleware('auth:sanctum');
-Route::post('/driver/moderation/set', [ModerationController::class, 'setToModeration'])->middleware('auth:sanctum');
-Route::post('/driver/moderation/upload_image', [ModerationController::class, 'uploadImage'])->middleware('auth:sanctum');
-Route::post('/driver/moderation/delete_image', [ModerationController::class, 'deleteImage'])->middleware('auth:sanctum');
+Route::group(['middleware' => 'auth:sanctum'], function () {
+    Route::get('/driver/moderation', [ModerationController::class, 'index']);
+    Route::post('/driver/moderation', [ModerationController::class, 'store']);
+    Route::post('/driver/moderation/set', [ModerationController::class, 'setToModeration']);
+    Route::post('/driver/moderation/upload_image', [ModerationController::class, 'uploadImage']);
+    Route::post('/driver/moderation/delete_image', [ModerationController::class, 'deleteImage']);
+});
+
 
 // Driver
-Route::get('/driver/profile', [DriverController::class, 'profile'])->middleware('auth:sanctum');
-Route::post('/driver/avatar', [DriverController::class, 'uploadImage'])->middleware('auth:sanctum');
-Route::delete('/driver/avatar', [DriverController::class, 'deleteImage'])->middleware('auth:sanctum');
-Route::get('/driver/level', [DriverController::class, 'level'])->middleware('auth:sanctum');
-Route::get('/driver/shifts', [DriverController::class, 'shifts'])->middleware('auth:sanctum');
-Route::post('/driver/shifts/{shift_price_id}', [DriverController::class, 'order'])->middleware('auth:sanctum');
-Route::get('/driver/shifts_orders', [DriverController::class, 'shiftOrders'])->middleware('auth:sanctum');
-Route::get('/driver/shift_status', [DriverController::class, 'shiftStatus'])->middleware('auth:sanctum');
-
+Route::group(['middleware' => 'auth:sanctum'], function () {
+    Route::get('/driver/profile', [DriverController::class, 'profile']);
+    Route::post('/driver/avatar', [DriverController::class, 'uploadImage']);
+    Route::delete('/driver/avatar', [DriverController::class, 'deleteImage']);
+    Route::get('/driver/level', [DriverController::class, 'level']);
+    Route::get('/driver/shifts', [DriverController::class, 'shifts']);
+    Route::post('/driver/shifts/{shift_price_id}', [DriverController::class, 'order']);
+    Route::get('/driver/shifts_orders', [DriverController::class, 'shiftOrders']);
+    Route::get('/driver/shift_status', [DriverController::class, 'shiftStatus']);
+});
 // Pay
-Route::get('/pay/info', [PayController::class, 'getPayInfo'])->middleware('auth:sanctum');
+Route::group(['middleware' => 'auth:sanctum'], function () {
+    Route::get('/pay/info', [PayController::class, 'getPayInfo']);
+});
 
 // Driver orders
-Route::get('/driver/orders', [DriverOrderController::class, 'getNewOrders'])->middleware('auth:sanctum');
-Route::get('/driver/orders/{id}', [DriverOrderController::class, 'showOrder'])->middleware('auth:sanctum');
-Route::post('/driver/orders/{id}', [DriverOrderController::class, 'takeOrder'])->middleware('auth:sanctum');
-Route::post('/driver/order/{id}/close', [DriverOrderController::class, 'closeOrder'])->middleware('auth:sanctum');
-Route::post('/driver/order/{id}/cancel', [DriverOrderController::class, 'cancelOrder'])->middleware('auth:sanctum');
-Route::get('/driver/my_orders', [DriverOrderController::class, 'myOrders'])->middleware('auth:sanctum');
-Route::get('/driver/history_orders', [DriverOrderController::class, 'historyOrders'])->middleware('auth:sanctum');
-
+Route::group(['middleware' => 'auth:sanctum'], function () {
+    Route::get('/driver/orders', [DriverOrderController::class, 'getNewOrders']);
+    Route::get('/driver/orders/{id}', [DriverOrderController::class, 'showOrder']);
+    Route::post('/driver/orders/{id}', [DriverOrderController::class, 'takeOrder']);
+    Route::post('/driver/order/{id}/close', [DriverOrderController::class, 'closeOrder']);
+    Route::post('/driver/order/{id}/cancel', [DriverOrderController::class, 'cancelOrder']);
+    Route::get('/driver/my_orders', [DriverOrderController::class, 'myOrders']);
+    Route::get('/driver/history_orders', [DriverOrderController::class, 'historyOrders']);
+});
 
 // Order
-Route::middleware('auth:sanctum')->group(function () {
+Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::get('/orders', [OrderController::class, 'index']);
     Route::post('/orders', [OrderController::class, 'create']);
     Route::put('/orders/{id}', [OrderController::class, 'update']);

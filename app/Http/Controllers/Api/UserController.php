@@ -200,7 +200,7 @@ class UserController extends Controller
     }
 
     // Новый метод для регистрации через Apple (улучшенная версия)
-    public function registerWithApple(Request $request)
+    public function appleMobileAuth(Request $request)
     {
         try {
             $this->validate($request, [
