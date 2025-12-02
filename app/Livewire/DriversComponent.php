@@ -62,7 +62,8 @@ class DriversComponent extends Component
         $this->car_number = $editItem->car_number;
         $this->car_images = $editItem->car_images;
         $this->status = $editItem->status;
-        $this->class_id = $editItem->class_id;
+        $this->class_id = $editItem->class_id ?? 1; // Устанавливаем значение по умолчанию, если class_id равен null
+        $this->people = $editItem->people ?? 3; // Устанавливаем значение по умолчанию для people
         $this->delivery = $editItem->delivery;
         $this->cargo = $editItem->cargo;
         $this->avatar = $editItem->avatar ? str_replace('public/', 'storage/', $editItem->avatar) : null;
@@ -95,7 +96,7 @@ class DriversComponent extends Component
             'car_name' => 'required|string',
             'car_number' => 'required|string',
             'status' => 'nullable|sometimes|integer|in:0,1',
-            'class_id' => 'required|integer|exists:tx_car_classes,id',
+            'class_id' => 'nullable|sometimes|integer|exists:tx_car_classes,id',
             'people' => 'required|integer',
         ]);
 
@@ -107,7 +108,8 @@ class DriversComponent extends Component
         $item->car_name = $this->car_name;
         $item->car_number = $this->car_number;
         $item->people = $this->people;
-        $item->class_id = $this->class_id;
+        // Используем значение по умолчанию 1, если class_id не указан или пустой
+        $item->class_id = ($this->class_id && $this->class_id != '') ? (int)$this->class_id : 1;
         $item->status = $this->status ?? 1;
 
         if ($this->avatar_select) {
