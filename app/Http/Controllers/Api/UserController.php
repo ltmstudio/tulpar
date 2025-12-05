@@ -8,6 +8,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Laravel\Socialite\Facades\Socialite;
@@ -202,6 +203,10 @@ class UserController extends Controller
     // Новый метод для регистрации через Apple (улучшенная версия)
     public function appleMobileAuth(Request $request)
     {
+
+        Log::info('Apple Mobile Auth Request: ' . json_encode($request->all()));
+
+
         try {
             $this->validate($request, [
                 'name' => ['required', 'string', 'max:255'],
@@ -258,6 +263,9 @@ class UserController extends Controller
                     }
                 }
             }
+
+            Log::info('Apple Mobile Auth Response: ' . json_encode($user));
+            Log::info('Apple Mobile Auth Token: ' . $user->createToken('authToken')->plainTextToken);
 
             return response()->json([
                 'success' => true,
