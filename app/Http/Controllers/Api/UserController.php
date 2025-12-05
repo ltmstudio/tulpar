@@ -207,7 +207,8 @@ class UserController extends Controller
                 'name' => ['required', 'string', 'max:255'],
                 'email' => ['nullable', 'string', 'email', 'max:255'],
                 'apple_id' => ['required', 'string'],
-                'auth_type' => ['required', 'in:apple'],
+                'phone' => 'nullable|string|min:4|max:20',
+                // 'auth_type' => ['required', 'in:apple'],
             ]);
 
             // Проверяем, существует ли пользователь с таким apple_id
@@ -235,6 +236,10 @@ class UserController extends Controller
                             'ref' => 0,
                             'password' => bcrypt('password'), // Генерируем случайный пароль
                         ]);
+                        if ($request->phone) {
+                            $user->phone = $request->phone;
+                            $user->save();
+                        }
                     }
                 } else {
                     // Создаем нового пользователя без email (Apple может не предоставить email)
@@ -247,6 +252,10 @@ class UserController extends Controller
                         'ref' => 0,
                         'password' => bcrypt('password'),
                     ]);
+                    if ($request->phone) {
+                        $user->phone = $request->phone;
+                        $user->save();
+                    }
                 }
             }
 
