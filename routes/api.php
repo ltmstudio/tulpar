@@ -58,12 +58,7 @@ Route::post('/auth/login', [UserController::class, 'login']);
 // Route::get('/auth/google/callback', [UserController::class, 'googleCallback'])->middleware(['web', 'throttle:api']); //web не используется для google йесли на будущее
 Route::post('/auth/google/mobile', [UserController::class, 'googleMobileAuth']);
 
-
-
 Route::post('/auth/apple/mobile', [UserController::class, 'appleMobileAuth']);
-
-
-
 
 // Moderation
 Route::group(['middleware' => 'auth:sanctum'], function () {

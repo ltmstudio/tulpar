@@ -213,66 +213,91 @@ class UserController extends Controller
                 'email' => ['nullable', 'string', 'email', 'max:255'],
                 'apple_id' => ['required', 'string'],
                 'phone' => 'nullable|string|min:4|max:20',
-                // 'auth_type' => ['required', 'in:apple'],
             ]);
 
-            // Проверяем, существует ли пользователь с таким apple_id
+            // Ищем пользователя по apple_id
             $user = User::where('apple_id', $request->apple_id)->first();
 
-            if (!$user) {
-                // Если пользователь не найден по apple_id, проверяем по email
-                if ($request->email) {
-                    $existingUser = User::where('email', $request->email)->first();
+            if ($user) {
+                // Обновляем данные существующего пользователя
+                $updateData = [];
 
-                    if ($existingUser) {
-                        // Если пользователь существует с этим email, но без apple_id
-                        $existingUser->apple_id = $request->apple_id;
-                        $existingUser->auth_type = 'apple';
-                        $existingUser->save();
-                        $user = $existingUser;
-                    } else {
-                        // Создаем нового пользователя
-                        $user = User::create([
-                            'name' => $request->name,
-                            'email' => $request->email ?? null,
+                // Обновляем имя, если оно изменилось
+                if ($user->name !== $request->name) {
+                    $updateData['name'] = $request->name;
+                }
+
+                // Обновляем email, если он предоставлен и отличается
+                if ($request->email && $user->email !== $request->email) {
+                    // Проверяем, не используется ли email другим пользователем
+                    $emailExists = User::where('email', $request->email)
+                        ->where('id', '!=', $user->id)
+                        ->exists();
+
+                    if (!$emailExists) {
+                        $updateData['email'] = $request->email;
+                    }
+                }
+
+                // Обновляем телефон, если он предоставлен и отличается
+                if ($request->phone && $user->phone !== $request->phone) {
+                    $updateData['phone'] = $request->phone;
+                }
+
+                // Убеждаемся, что auth_type установлен
+                if ($user->auth_type !== 'apple') {
+                    $updateData['auth_type'] = 'apple';
+                }
+
+                // Сохраняем изменения, если они есть
+                if (!empty($updateData)) {
+                    $user->update($updateData);
+                }
+            } else {
+                // Пользователь не найден по apple_id, проверяем по email
+                if ($request->email) {
+                    $user = User::where('email', $request->email)->first();
+
+                    if ($user) {
+                        // Пользователь существует с этим email, привязываем apple_id
+                        $user->update([
                             'apple_id' => $request->apple_id,
                             'auth_type' => 'apple',
-                            'role' => 'CST',
-                            'ref' => 0,
-                            'password' => bcrypt('password'), // Генерируем случайный пароль
+                            'name' => $request->name, // Обновляем имя
                         ]);
+
+                        // Обновляем телефон, если предоставлен
                         if ($request->phone) {
                             $user->phone = $request->phone;
                             $user->save();
                         }
                     }
-                } else {
-                    // Создаем нового пользователя без email (Apple может не предоставить email)
+                }
+
+                // Если пользователь все еще не найден, создаем нового
+                if (!$user) {
                     $user = User::create([
                         'name' => $request->name,
-                        'email' => null,
+                        'email' => $request->email ?? null,
                         'apple_id' => $request->apple_id,
                         'auth_type' => 'apple',
                         'role' => 'CST',
                         'ref' => 0,
                         'password' => bcrypt('password'),
+                        'phone' => $request->phone ?? null,
                     ]);
-                    if ($request->phone) {
-                        $user->phone = $request->phone;
-                        $user->save();
-                    }
                 }
             }
 
-            Log::info('Apple Mobile Auth Response: ' . json_encode($user));
-            Log::info('Apple Mobile Auth Token: ' . $user->createToken('authToken')->plainTextToken);
+            // Создаем токен
+            $token = $user->createToken('authToken')->plainTextToken;
 
             return response()->json([
                 'success' => true,
-                'message' => 'Регистрация через Apple прошла успешно',
+                'message' => 'Авторизация через Apple прошла успешно',
                 'data' => [
-                    'token' => $user->createToken('authToken')->plainTextToken,
-                    'profile' => $user
+                    'token' => $token,
+                    'profile' => $user->fresh() // Получаем актуальные данные из БД
                 ]
             ]);
         } catch (ValidationException $e) {
@@ -282,6 +307,7 @@ class UserController extends Controller
                 'errors' => $e->errors(),
             ], 422);
         } catch (\Exception $e) {
+            Log::error('Apple Mobile Auth Error: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => 'Произошла ошибка',
